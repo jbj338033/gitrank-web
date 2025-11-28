@@ -9,23 +9,22 @@ export type AuthStep =
   | 'syncing_stats'
   | 'issuing_tokens';
 
-interface AuthCompleteData {
+interface TokenResponse {
   accessToken: string;
   refreshToken: string;
   user: User;
 }
 
-type AuthEventCallback = {
+interface AuthEventCallback {
   onProgress: (step: AuthStep) => void;
-  onComplete: (data: AuthCompleteData) => void;
+  onComplete: (data: TokenResponse) => void;
   onError: (error: string) => void;
-};
+}
 
 export const authApi = {
   getGitHubAuthUrl: () => {
-    const redirectUri = typeof window !== 'undefined'
-      ? `${window.location.origin}/auth/callback`
-      : '';
+    const redirectUri =
+      typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '';
     const params = new URLSearchParams({
       client_id: GITHUB_CLIENT_ID,
       redirect_uri: redirectUri,
@@ -41,7 +40,6 @@ export const authApi = {
     eventSource.onmessage = (e) => {
       try {
         const event = JSON.parse(e.data);
-
         if (event.type === 'progress') {
           callbacks.onProgress(event.step);
         } else if (event.type === 'complete') {
@@ -67,22 +65,5 @@ export const authApi = {
 
   logout: async (): Promise<void> => {
     await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true });
-  },
-
-  getMe: async (): Promise<User> => {
-    const { data } = await apiClient.get<User>(API_ENDPOINTS.USERS.ME);
-    return data;
-  },
-
-  deleteAccount: async (): Promise<void> => {
-    await apiClient.delete(API_ENDPOINTS.USERS.ME);
-  },
-
-  updateVisibility: async (visible: boolean): Promise<User> => {
-    const { data } = await apiClient.patch<User>(
-      API_ENDPOINTS.USERS.VISIBILITY,
-      { visible }
-    );
-    return data;
   },
 };

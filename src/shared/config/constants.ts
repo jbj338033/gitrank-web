@@ -22,8 +22,8 @@ export const API_ENDPOINTS = {
 } as const;
 
 export const QUERY_STALE_TIME = {
-  RANKINGS: 5 * 60 * 1000, // 5분
-  USER_INFO: 10 * 60 * 1000, // 10분
+  RANKINGS: 5 * 60 * 1000,
+  USER_INFO: 10 * 60 * 1000,
 } as const;
 
 export const SORT_OPTIONS = {

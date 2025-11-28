@@ -66,10 +66,8 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // 401 에러이고 재시도가 아닌 경우
     if (error.response?.status === 401 && !originalRequest._retry && refreshToken) {
       if (isRefreshing) {
-        // 이미 리프레시 중이면 대기
         return new Promise((resolve) => {
           subscribeTokenRefresh((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
@@ -89,7 +87,6 @@ apiClient.interceptors.response.use(
         );
 
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
-
         setTokens(newAccessToken, newRefreshToken);
         onTokenRefreshed(newAccessToken);
 
@@ -97,14 +94,10 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         clearTokens();
-
-        // 브라우저 환경에서만 리다이렉트
         if (typeof window !== 'undefined') {
-          // localStorage에서 auth 데이터 삭제
           localStorage.removeItem('auth-storage');
           window.location.href = '/login';
         }
-
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -115,7 +108,6 @@ apiClient.interceptors.response.use(
   }
 );
 
-// API 에러 타입
 export interface ApiError {
   message: string;
   status: number;

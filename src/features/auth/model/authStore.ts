@@ -81,7 +81,6 @@ export const useAuthStore = create<AuthStore>()(
   )
 );
 
-// 선택자 훅
 export const useUser = () => useAuthStore((state) => state.user);
 export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated);
 export const useIsHydrated = () => useAuthStore((state) => state.isHydrated);

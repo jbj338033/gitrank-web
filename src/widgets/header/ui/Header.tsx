@@ -27,7 +27,6 @@ export function Header() {
     try {
       await authApi.logout();
     } catch {
-      // Ignore
     } finally {
       logout();
       setIsOpen(false);

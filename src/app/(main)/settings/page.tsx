@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
-import { useAuthStore, authApi } from '@/features/auth';
+import { useAuthStore } from '@/features/auth';
+import { userApi } from '@/entities/user';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -22,10 +23,9 @@ export default function SettingsPage() {
     if (!user) return;
     setIsSaving(true);
     try {
-      const updatedUser = await authApi.updateVisibility(!user.visible);
+      const updatedUser = await userApi.updateVisibility(!user.visible);
       updateUser(updatedUser);
     } catch {
-      // Handle error
     } finally {
       setIsSaving(false);
     }
@@ -34,11 +34,10 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     try {
-      await authApi.deleteAccount();
+      await userApi.deleteMe();
       logout();
       router.push('/users');
     } catch {
-      // Handle error
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
