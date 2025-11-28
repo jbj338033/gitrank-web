@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { UserRankingTable } from '@/widgets/user-ranking-table';
 
 export const metadata: Metadata = {
-  title: 'Users | GitRank',
-  description: 'Top GitHub users ranked by commits, stars, and followers.',
+  title: 'Users',
 };
 
 export default function UsersPage() {

@@ -3,9 +3,12 @@ import { Providers } from '@/providers/Providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GitRank - GitHub User & Repository Rankings',
-  description: 'Discover top GitHub users and repositories ranked by commits, stars, and followers.',
-  keywords: ['GitHub', 'ranking', 'developers', 'repositories', 'open source'],
+  title: {
+    default: 'GitRank',
+    template: '%s | GitRank',
+  },
+  description: 'GitHub rankings for users and repositories',
+  metadataBase: new URL('https://gitrank.jmo.kr'),
 };
 
 export default function RootLayout({

@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { RepoRankingTable } from './RepoRankingTable';
 
 export const metadata: Metadata = {
-  title: 'Repos | GitRank',
-  description: 'Top GitHub repositories ranked by stars.',
+  title: 'Repos',
 };
 
 export default function ReposPage() {
