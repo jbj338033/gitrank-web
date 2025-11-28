@@ -2,6 +2,9 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_GITHUB_CLIENT_ID
+
 RUN corepack enable pnpm
 
 COPY package.json pnpm-lock.yaml ./
