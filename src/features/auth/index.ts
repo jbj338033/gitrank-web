@@ -2,3 +2,4 @@ export { useAuthStore, useUser, useIsAuthenticated, useIsHydrated } from './mode
 export { authApi } from './api/authApi';
 export type { AuthStep } from './api/authApi';
 export { LoginButton } from './ui/LoginButton';
+export { AuthCallbackContent } from './ui/AuthCallbackContent';

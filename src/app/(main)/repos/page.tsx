@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { RepoRankingTable } from './RepoRankingTable';
+import { RepoRankingTable } from '@/widgets/repo-ranking-table';
 
 export const metadata: Metadata = {
   title: 'Repos',

@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, Check } from 'lucide-react';
-import { useAuthStore, authApi, AuthStep } from '@/features/auth';
+import { useAuthStore } from '../model/authStore';
+import { authApi, AuthStep } from '../api/authApi';
 
 const STEP_LABELS: Record<AuthStep, string> = {
   authenticating: 'Authenticating',
