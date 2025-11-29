@@ -4,16 +4,14 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOut, Settings, FolderGit2 } from 'lucide-react';
+import { LogOut, Settings, FolderGit2, Globe } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuthStore, LoginButton, authApi } from '@/features/auth';
 import { cn, getGitHubAvatarUrl, useClickOutside } from '@/shared/lib';
 
-const NAV_LINKS = [
-  { href: '/users', label: 'Users' },
-  { href: '/repos', label: 'Repos' },
-];
-
 export function Header() {
+  const t = useTranslations();
+  const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const { user, isAuthenticated, isHydrated, logout } = useAuthStore();
@@ -34,6 +32,21 @@ export function Header() {
     }
   };
 
+  const toggleLocale = async () => {
+    const newLocale = locale === 'ko' ? 'en' : 'ko';
+    await fetch('/api/locale', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ locale: newLocale }),
+    });
+    router.refresh();
+  };
+
+  const navLinks = [
+    { href: '/users', label: t('nav.users') },
+    { href: '/repos', label: t('nav.repos') },
+  ];
+
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-md">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
@@ -45,7 +58,7 @@ export function Header() {
           </Link>
 
           <div className="hidden items-center gap-4 sm:flex">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -62,7 +75,15 @@ export function Header() {
           </div>
         </div>
 
-        <div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleLocale}
+            className="flex items-center gap-1 text-sm text-text-muted transition-colors hover:text-text-primary"
+          >
+            <Globe className="h-4 w-4" />
+            <span className="uppercase">{locale}</span>
+          </button>
+
           {!isHydrated ? (
             <div className="h-8 w-8 animate-pulse rounded-full bg-surface" />
           ) : isAuthenticated && user ? (
@@ -89,7 +110,7 @@ export function Header() {
                       className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
                     >
                       <FolderGit2 className="h-4 w-4" />
-                      My Repos
+                      {t('header.myRepos')}
                     </Link>
                     <Link
                       href="/settings"
@@ -97,7 +118,7 @@ export function Header() {
                       className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
                     >
                       <Settings className="h-4 w-4" />
-                      Settings
+                      {t('header.settings')}
                     </Link>
                   </div>
                   <div className="border-t border-border py-1">
@@ -106,7 +127,7 @@ export function Header() {
                       className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-400 transition-colors hover:bg-surface-hover"
                     >
                       <LogOut className="h-4 w-4" />
-                      Sign out
+                      {t('auth.signOut')}
                     </button>
                   </div>
                 </div>

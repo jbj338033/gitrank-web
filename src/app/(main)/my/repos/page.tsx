@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, X, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/features/auth';
 import { useMyRepos, RepoRegisterList } from '@/features/repo-register';
 import { useDebounce } from '@/shared/lib/hooks';
 
 export default function MyReposPage() {
+  const t = useTranslations('myRepos');
+  const tc = useTranslations('common');
   const router = useRouter();
   const { isAuthenticated, isHydrated } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,12 +36,12 @@ export default function MyReposPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
       <div className="mb-4 flex items-center gap-4">
-        <h1 className="text-lg font-semibold text-text-primary">My Repos</h1>
+        <h1 className="text-lg font-semibold text-text-primary">{t('title')}</h1>
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={tc('search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-lg border border-border bg-transparent py-2 pl-9 pr-9 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
@@ -59,10 +62,10 @@ export default function MyReposPage() {
           <Loader2 className="h-6 w-6 animate-spin text-text-muted" />
         </div>
       ) : error ? (
-        <div className="py-12 text-center text-sm text-red-400">Failed to load repositories</div>
+        <div className="py-12 text-center text-sm text-red-400">{t('loadFailed')}</div>
       ) : !data || data.length === 0 ? (
         <div className="py-12 text-center text-sm text-text-muted">
-          {searchQuery ? `No results for "${searchQuery}"` : 'No repositories found'}
+          {searchQuery ? t('noResults', { query: searchQuery }) : t('noRepos')}
         </div>
       ) : (
         <RepoRegisterList repos={data} />

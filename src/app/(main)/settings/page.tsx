@@ -3,10 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, RefreshCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '@/features/auth';
 import { useSync, useUpdateVisibility, useDeleteAccount } from '@/features/user-settings';
 
 export default function SettingsPage() {
+  const t = useTranslations('settings');
+  const tc = useTranslations('common');
   const router = useRouter();
   const { user, isAuthenticated, isHydrated } = useAuthStore();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -39,13 +42,13 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-lg space-y-6 px-4 py-6">
-      <h1 className="text-lg font-semibold text-text-primary">Settings</h1>
+      <h1 className="text-lg font-semibold text-text-primary">{t('title')}</h1>
 
       <div className="rounded-lg border border-border">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <p className="text-sm font-medium text-text-primary">Sync GitHub data</p>
-            <p className="text-xs text-text-muted">Update repositories and stats</p>
+            <p className="text-sm font-medium text-text-primary">{t('syncGithub')}</p>
+            <p className="text-xs text-text-muted">{t('syncGithubDesc')}</p>
           </div>
           <button
             onClick={() => sync.mutate()}
@@ -53,7 +56,7 @@ export default function SettingsPage() {
             className="flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-accent/90 disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${sync.isPending ? 'animate-spin' : ''}`} />
-            {sync.isPending ? 'Syncing...' : 'Sync'}
+            {sync.isPending ? t('syncing') : t('sync')}
           </button>
         </div>
       </div>
@@ -61,8 +64,8 @@ export default function SettingsPage() {
       <div className="rounded-lg border border-border">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <p className="text-sm font-medium text-text-primary">Profile visibility</p>
-            <p className="text-xs text-text-muted">Show in public rankings</p>
+            <p className="text-sm font-medium text-text-primary">{t('visibility')}</p>
+            <p className="text-xs text-text-muted">{t('visibilityDesc')}</p>
           </div>
           <button
             onClick={() => updateVisibility.mutate(!user.visible)}
@@ -83,8 +86,8 @@ export default function SettingsPage() {
       <div className="rounded-lg border border-red-900/50">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <p className="text-sm font-medium text-red-400">Delete account</p>
-            <p className="text-xs text-text-muted">Permanently remove your data</p>
+            <p className="text-sm font-medium text-red-400">{t('deleteAccount')}</p>
+            <p className="text-xs text-text-muted">{t('deleteAccountDesc')}</p>
           </div>
           {showDeleteConfirm ? (
             <div className="flex items-center gap-2">
@@ -93,14 +96,14 @@ export default function SettingsPage() {
                 disabled={deleteAccount.isPending}
                 className="rounded-md px-3 py-1.5 text-sm text-text-muted hover:text-text-primary"
               >
-                Cancel
+                {tc('cancel')}
               </button>
               <button
                 onClick={() => deleteAccount.mutate()}
                 disabled={deleteAccount.isPending}
                 className="rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50"
               >
-                {deleteAccount.isPending ? 'Deleting...' : 'Confirm'}
+                {deleteAccount.isPending ? t('deleting') : tc('confirm')}
               </button>
             </div>
           ) : (
@@ -108,7 +111,7 @@ export default function SettingsPage() {
               onClick={() => setShowDeleteConfirm(true)}
               className="rounded-md border border-red-900/50 px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/20"
             >
-              Delete
+              {tc('delete')}
             </button>
           )}
         </div>

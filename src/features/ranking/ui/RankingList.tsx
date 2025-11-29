@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { InfiniteScroll } from '@/shared/ui';
 
 interface RankingListProps {
@@ -21,6 +22,8 @@ export function RankingList({
   isFetchingNextPage,
   isEmpty,
 }: RankingListProps) {
+  const t = useTranslations('ranking');
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -32,7 +35,7 @@ export function RankingList({
   if (isEmpty) {
     return (
       <div className="py-12 text-center text-sm text-text-muted">
-        No results found
+        {t('noResults')}
       </div>
     );
   }

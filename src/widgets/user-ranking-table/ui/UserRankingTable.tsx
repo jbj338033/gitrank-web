@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { UserRow } from '@/entities/user';
 import { useUserRankings, RankingFilter, RankingList } from '@/features/ranking';
 
 export function UserRankingTable() {
+  const t = useTranslations('ranking');
   const [sort, setSort] = useState('commits');
 
   const {
@@ -24,9 +26,9 @@ export function UserRankingTable() {
         sort={sort}
         onSortChange={setSort}
         sortOptions={[
-          { value: 'commits', label: 'Commits' },
-          { value: 'stars', label: 'Stars' },
-          { value: 'followers', label: 'Followers' },
+          { value: 'commits', label: t('commits') },
+          { value: 'stars', label: t('stars') },
+          { value: 'followers', label: t('followers') },
         ]}
       />
       <RankingList

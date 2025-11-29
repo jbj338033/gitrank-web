@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { RepoRow } from '@/entities/repo';
 import { useRepoRankings, RankingFilter, RankingList } from '@/features/ranking';
 
 export function RepoRankingTable() {
+  const t = useTranslations('ranking');
   const [sort, setSort] = useState('stars');
 
   const {
@@ -24,8 +26,8 @@ export function RepoRankingTable() {
         sort={sort}
         onSortChange={setSort}
         sortOptions={[
-          { value: 'stars', label: 'Stars' },
-          { value: 'forks', label: 'Forks' },
+          { value: 'stars', label: t('stars') },
+          { value: 'forks', label: t('forks') },
         ]}
       />
       <RankingList

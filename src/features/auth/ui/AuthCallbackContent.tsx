@@ -3,23 +3,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuthStore } from '../model/authStore';
 import { authApi, AuthStep } from '../api/authApi';
-
-const STEP_LABELS: Record<AuthStep, string> = {
-  authenticating: 'Authenticating',
-  syncing: 'Syncing data',
-};
 
 const STEPS: AuthStep[] = ['authenticating', 'syncing'];
 
 export function AuthCallbackContent() {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuthStore();
   const hasStarted = useRef(false);
   const [currentStep, setCurrentStep] = useState<AuthStep>('authenticating');
   const [error, setError] = useState<string | null>(null);
+
+  const stepLabels: Record<AuthStep, string> = {
+    authenticating: t('auth.authenticating'),
+    syncing: t('auth.syncingData'),
+  };
 
   useEffect(() => {
     const code = searchParams.get('code');
@@ -54,7 +56,7 @@ export function AuthCallbackContent() {
     return (
       <div className="space-y-3 text-center">
         <p className="text-sm text-red-400">{error}</p>
-        <p className="text-xs text-text-muted">Redirecting...</p>
+        <p className="text-xs text-text-muted">{t('common.redirecting')}</p>
       </div>
     );
   }
@@ -81,7 +83,7 @@ export function AuthCallbackContent() {
                 isCompleted || isCurrent ? 'text-text-primary' : 'text-text-muted'
               }`}
             >
-              {STEP_LABELS[step]}
+              {stepLabels[step]}
             </span>
           </div>
         );
