@@ -38,7 +38,7 @@ export function RepoRankingTable() {
         isEmpty={isEmpty}
       >
         {rankings.map((ranking) => (
-          <RepoRow key={ranking.id} ranking={ranking} />
+          <RepoRow key={ranking.id} ranking={ranking} sort={sort} />
         ))}
       </RankingList>
     </div>
