@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -16,8 +16,13 @@ const NAV_LINKS = [
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isAuthenticated, logout, isHydrated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const dropdownRef = useClickOutside<HTMLDivElement>(
     useCallback(() => setIsOpen(false), [])
@@ -63,7 +68,7 @@ export function Header() {
         </div>
 
         <div>
-          {!isHydrated ? (
+          {!mounted ? (
             <div className="h-8 w-8 animate-pulse rounded-full bg-surface" />
           ) : isAuthenticated && user ? (
             <div className="relative" ref={dropdownRef}>

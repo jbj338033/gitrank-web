@@ -2,49 +2,37 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '@/features/auth';
-import { userApi } from '@/entities/user';
+import { useSync, useUpdateVisibility, useDeleteAccount } from '@/features/user-settings';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, isAuthenticated, isHydrated, logout, updateUser } = useAuthStore();
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { user, isAuthenticated } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const sync = useSync();
+  const updateVisibility = useUpdateVisibility();
+  const deleteAccount = useDeleteAccount();
+
   useEffect(() => {
-    if (isHydrated && !isAuthenticated) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isAuthenticated) {
       router.push('/users');
     }
-  }, [isHydrated, isAuthenticated, router]);
+  }, [mounted, isAuthenticated, router]);
 
-  const handleVisibilityToggle = async () => {
-    if (!user) return;
-    setIsSaving(true);
-    try {
-      const updatedUser = await userApi.updateVisibility(!user.visible);
-      updateUser(updatedUser);
-    } catch {
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    setIsDeleting(true);
-    try {
-      await userApi.deleteMe();
-      logout();
+  useEffect(() => {
+    if (deleteAccount.isSuccess) {
       router.push('/users');
-    } catch {
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteConfirm(false);
     }
-  };
+  }, [deleteAccount.isSuccess, router]);
 
-  if (!isHydrated || !isAuthenticated || !user) {
+  if (!mounted || !isAuthenticated || !user) {
     return (
       <div className="mx-auto max-w-lg px-4 py-6">
         <div className="flex justify-center py-12">
@@ -61,12 +49,29 @@ export default function SettingsPage() {
       <div className="rounded-lg border border-border">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
+            <p className="text-sm font-medium text-text-primary">Sync GitHub data</p>
+            <p className="text-xs text-text-muted">Update repositories and stats</p>
+          </div>
+          <button
+            onClick={() => sync.mutate()}
+            disabled={sync.isPending}
+            className="flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-accent/90 disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${sync.isPending ? 'animate-spin' : ''}`} />
+            {sync.isPending ? 'Syncing...' : 'Sync'}
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-border">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div>
             <p className="text-sm font-medium text-text-primary">Profile visibility</p>
             <p className="text-xs text-text-muted">Show in public rankings</p>
           </div>
           <button
-            onClick={handleVisibilityToggle}
-            disabled={isSaving}
+            onClick={() => updateVisibility.mutate(!user.visible)}
+            disabled={updateVisibility.isPending}
             className={`relative h-6 w-11 rounded-full transition-colors disabled:opacity-50 ${
               user.visible ? 'bg-accent' : 'bg-border'
             }`}
@@ -81,35 +86,34 @@ export default function SettingsPage() {
       </div>
 
       <div className="rounded-lg border border-red-900/50">
-        <div className="px-4 py-3">
-          <p className="text-sm font-medium text-red-400">Delete account</p>
-          <p className="text-xs text-text-muted">Permanently remove your data</p>
-        </div>
-        <div className="border-t border-red-900/50 px-4 py-3">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-red-400">Delete account</p>
+            <p className="text-xs text-text-muted">Permanently remove your data</p>
+          </div>
           {showDeleteConfirm ? (
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-text-secondary">Are you sure?</span>
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                disabled={isDeleting}
-                className="text-sm text-text-muted hover:text-text-primary"
+                disabled={deleteAccount.isPending}
+                className="rounded-md px-3 py-1.5 text-sm text-text-muted hover:text-text-primary"
               >
                 Cancel
               </button>
               <button
-                onClick={handleDeleteAccount}
-                disabled={isDeleting}
-                className="text-sm font-medium text-red-400 hover:text-red-300"
+                onClick={() => deleteAccount.mutate()}
+                disabled={deleteAccount.isPending}
+                className="rounded-md bg-red-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50"
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {deleteAccount.isPending ? 'Deleting...' : 'Confirm'}
               </button>
             </div>
           ) : (
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="text-sm text-red-400 hover:text-red-300"
+              className="rounded-md border border-red-900/50 px-3 py-1.5 text-sm text-red-400 hover:bg-red-900/20"
             >
-              Delete account
+              Delete
             </button>
           )}
         </div>

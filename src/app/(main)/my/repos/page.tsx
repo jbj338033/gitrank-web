@@ -9,18 +9,23 @@ import { useDebounce } from '@/shared/lib/hooks';
 
 export default function MyReposPage() {
   const router = useRouter();
-  const { isAuthenticated, isHydrated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedQuery = useDebounce(searchQuery, 300);
   const { data, isLoading, error } = useMyRepos(debouncedQuery || undefined);
 
   useEffect(() => {
-    if (isHydrated && !isAuthenticated) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isAuthenticated) {
       router.push('/users');
     }
-  }, [isHydrated, isAuthenticated, router]);
+  }, [mounted, isAuthenticated, router]);
 
-  if (!isHydrated || !isAuthenticated) {
+  if (!mounted || !isAuthenticated) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
         <div className="flex justify-center py-12">
@@ -59,15 +64,13 @@ export default function MyReposPage() {
           <Loader2 className="h-6 w-6 animate-spin text-text-muted" />
         </div>
       ) : error ? (
-        <div className="py-12 text-center text-sm text-red-400">
-          Failed to load repositories
-        </div>
-      ) : !data?.repos || data.repos.length === 0 ? (
+        <div className="py-12 text-center text-sm text-red-400">Failed to load repositories</div>
+      ) : !data || data.length === 0 ? (
         <div className="py-12 text-center text-sm text-text-muted">
           {searchQuery ? `No results for "${searchQuery}"` : 'No repositories found'}
         </div>
       ) : (
-        <RepoRegisterList repos={data.repos} />
+        <RepoRegisterList repos={data} />
       )}
     </div>
   );
