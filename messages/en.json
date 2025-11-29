@@ -45,6 +45,10 @@
     "commits": "Commits",
     "stars": "Stars",
     "followers": "Followers",
-    "forks": "Forks"
+    "forks": "Forks",
+    "all": "All",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly"
   }
 }

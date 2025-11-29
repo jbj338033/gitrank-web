@@ -8,6 +8,7 @@ import { useUserRankings, RankingFilter, RankingList } from '@/features/ranking'
 export function UserRankingTable() {
   const t = useTranslations('ranking');
   const [sort, setSort] = useState('commits');
+  const [period, setPeriod] = useState('all');
 
   const {
     data,
@@ -15,7 +16,7 @@ export function UserRankingTable() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useUserRankings({ sort });
+  } = useUserRankings({ sort, period });
 
   const rankings = data?.pages.flatMap((page) => page.content) ?? [];
   const isEmpty = !isLoading && rankings.length === 0;
@@ -29,6 +30,14 @@ export function UserRankingTable() {
           { value: 'commits', label: t('commits') },
           { value: 'stars', label: t('stars') },
           { value: 'followers', label: t('followers') },
+        ]}
+        period={period}
+        onPeriodChange={setPeriod}
+        periodOptions={[
+          { value: 'all', label: t('all') },
+          { value: 'daily', label: t('daily') },
+          { value: 'weekly', label: t('weekly') },
+          { value: 'monthly', label: t('monthly') },
         ]}
       />
       <RankingList
