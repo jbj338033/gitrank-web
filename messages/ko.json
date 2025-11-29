@@ -1,0 +1,50 @@
+{
+  "common": {
+    "loading": "로딩...",
+    "redirecting": "리다이렉트 중...",
+    "search": "검색...",
+    "cancel": "취소",
+    "confirm": "확인",
+    "delete": "삭제",
+    "noResults": "결과 없음"
+  },
+  "nav": {
+    "users": "유저",
+    "repos": "레포지토리"
+  },
+  "auth": {
+    "signIn": "로그인",
+    "signOut": "로그아웃",
+    "authenticating": "인증 중",
+    "syncingData": "데이터 동기화 중"
+  },
+  "header": {
+    "myRepos": "내 레포지토리",
+    "settings": "설정"
+  },
+  "settings": {
+    "title": "설정",
+    "syncGithub": "GitHub 데이터 동기화",
+    "syncGithubDesc": "레포지토리 및 통계 업데이트",
+    "sync": "동기화",
+    "syncing": "동기화 중...",
+    "visibility": "프로필 공개",
+    "visibilityDesc": "공개 랭킹에 표시",
+    "deleteAccount": "계정 삭제",
+    "deleteAccountDesc": "모든 데이터를 영구적으로 삭제",
+    "deleting": "삭제 중..."
+  },
+  "myRepos": {
+    "title": "내 레포지토리",
+    "noResults": "\"{query}\"에 대한 결과 없음",
+    "noRepos": "레포지토리가 없습니다",
+    "loadFailed": "레포지토리를 불러오는데 실패했습니다"
+  },
+  "ranking": {
+    "noResults": "결과가 없습니다",
+    "commits": "커밋",
+    "stars": "스타",
+    "followers": "팔로워",
+    "forks": "포크"
+  }
+}
