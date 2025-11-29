@@ -6,19 +6,17 @@ import { QUERY_STALE_TIME } from '@/shared/config/constants';
 interface UseUserRankingsParams {
   sort?: string;
   period?: string;
-  language?: string;
 }
 
 export function useUserRankings(params: UseUserRankingsParams = {}) {
-  const { sort = 'commits', period = 'all', language } = params;
+  const { sort = 'commits', period = 'all' } = params;
 
   return useInfiniteQuery({
-    queryKey: ['rankings', 'users', { sort, period, language }] as const,
+    queryKey: ['rankings', 'users', { sort, period }] as const,
     queryFn: ({ pageParam }) =>
       userApi.fetchRankings({
         sort,
         period,
-        language,
         cursor: pageParam,
       }),
     initialPageParam: undefined as string | undefined,
@@ -33,18 +31,16 @@ export function useUserRankings(params: UseUserRankingsParams = {}) {
 
 interface UseRepoRankingsParams {
   sort?: string;
-  language?: string;
 }
 
 export function useRepoRankings(params: UseRepoRankingsParams = {}) {
-  const { sort = 'stars', language } = params;
+  const { sort = 'stars' } = params;
 
   return useInfiniteQuery({
-    queryKey: ['rankings', 'repos', { sort, language }] as const,
+    queryKey: ['rankings', 'repos', { sort }] as const,
     queryFn: ({ pageParam }) =>
       repoApi.fetchRankings({
         sort,
-        language,
         cursor: pageParam,
       }),
     initialPageParam: undefined as string | undefined,
