@@ -1,13 +1,8 @@
-import { apiClient } from '@/shared/api/client';
+import { apiClient, getRefreshToken } from '@/shared/api/client';
 import { User } from '@/entities/user/model/types';
 import { API_ENDPOINTS, API_URL, GITHUB_CLIENT_ID } from '@/shared/config/constants';
 
-export type AuthStep =
-  | 'authenticating'
-  | 'creating_user'
-  | 'syncing_repos'
-  | 'syncing_stats'
-  | 'issuing_tokens';
+export type AuthStep = 'authenticating' | 'syncing';
 
 interface TokenResponse {
   accessToken: string;
@@ -25,12 +20,7 @@ export const authApi = {
   getGitHubAuthUrl: () => {
     const redirectUri =
       typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '';
-    const params = new URLSearchParams({
-      client_id: GITHUB_CLIENT_ID,
-      redirect_uri: redirectUri,
-      scope: 'read:user,repo',
-    });
-    return `https://github.com/login/oauth/authorize?${params}`;
+    return `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}`;
   },
 
   exchangeCodeStream: (code: string, callbacks: AuthEventCallback) => {
@@ -64,6 +54,7 @@ export const authApi = {
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true });
+    const refreshToken = getRefreshToken();
+    await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken });
   },
 };

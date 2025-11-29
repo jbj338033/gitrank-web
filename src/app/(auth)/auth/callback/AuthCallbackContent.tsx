@@ -7,19 +7,10 @@ import { useAuthStore, authApi, AuthStep } from '@/features/auth';
 
 const STEP_LABELS: Record<AuthStep, string> = {
   authenticating: 'Authenticating',
-  creating_user: 'Creating account',
-  syncing_repos: 'Syncing repositories',
-  syncing_stats: 'Syncing stats',
-  issuing_tokens: 'Finishing up',
+  syncing: 'Syncing data',
 };
 
-const STEPS: AuthStep[] = [
-  'authenticating',
-  'creating_user',
-  'syncing_repos',
-  'syncing_stats',
-  'issuing_tokens',
-];
+const STEPS: AuthStep[] = ['authenticating', 'syncing'];
 
 export function AuthCallbackContent() {
   const router = useRouter();
@@ -68,7 +59,7 @@ export function AuthCallbackContent() {
   }
 
   return (
-    <div className="w-64 space-y-4">
+    <div className="w-48 space-y-4">
       {STEPS.map((step, index) => {
         const isCompleted = index < currentStepIndex;
         const isCurrent = index === currentStepIndex;
@@ -86,11 +77,7 @@ export function AuthCallbackContent() {
             </div>
             <span
               className={`text-sm ${
-                isCompleted
-                  ? 'text-text-muted'
-                  : isCurrent
-                    ? 'text-text-primary'
-                    : 'text-text-muted'
+                isCompleted || isCurrent ? 'text-text-primary' : 'text-text-muted'
               }`}
             >
               {STEP_LABELS[step]}

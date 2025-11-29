@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
   USERS: {
     ME: '/api/v1/users/me',
     VISIBILITY: '/api/v1/users/me/visibility',
+    SYNC: '/api/v1/users/me/sync',
   },
   REPOS: {
     ME: '/api/v1/repos/me',
@@ -43,16 +44,4 @@ export const PERIOD_OPTIONS = [
   { value: 'yearly', label: 'This Year' },
   { value: 'monthly', label: 'This Month' },
   { value: 'weekly', label: 'This Week' },
-] as const;
-
-export const LANGUAGE_OPTIONS = [
-  { value: '', label: 'All Languages' },
-  { value: 'JavaScript', label: 'JavaScript' },
-  { value: 'TypeScript', label: 'TypeScript' },
-  { value: 'Python', label: 'Python' },
-  { value: 'Java', label: 'Java' },
-  { value: 'Go', label: 'Go' },
-  { value: 'Rust', label: 'Rust' },
-  { value: 'C++', label: 'C++' },
-  { value: 'C', label: 'C' },
 ] as const;
