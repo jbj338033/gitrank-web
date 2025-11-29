@@ -1,16 +1,24 @@
 'use client';
 
 import Image from 'next/image';
-import { GitCommitHorizontal, Star, Users } from 'lucide-react';
+import { GitCommitHorizontal, Star, Users, LucideIcon } from 'lucide-react';
 import { UserRanking } from '../model/types';
 import { formatNumber } from '@/shared/lib/utils';
 
+const STATS: Record<string, { icon: LucideIcon; key: keyof UserRanking }> = {
+  commits: { icon: GitCommitHorizontal, key: 'commits' },
+  stars: { icon: Star, key: 'stars' },
+  followers: { icon: Users, key: 'followers' },
+};
+
 interface UserRowProps {
   ranking: UserRanking;
+  sort: string;
 }
 
-export function UserRow({ ranking }: UserRowProps) {
-  const { rank, username, avatarUrl, commits, stars, followers } = ranking;
+export function UserRow({ ranking, sort }: UserRowProps) {
+  const { rank, username, avatarUrl } = ranking;
+  const { icon: MobileIcon, key } = STATS[sort];
 
   return (
     <a
@@ -31,18 +39,16 @@ export function UserRow({ ranking }: UserRowProps) {
         {username}
       </span>
       <div className="flex items-center gap-6 text-sm text-text-secondary">
-        <div className="flex items-center gap-1.5">
-          <GitCommitHorizontal className="h-4 w-4 text-text-muted" />
-          <span>{formatNumber(commits)}</span>
+        <div className="flex items-center gap-1.5 sm:hidden">
+          <MobileIcon className="h-4 w-4 text-text-muted" />
+          <span>{formatNumber(ranking[key] as number)}</span>
         </div>
-        <div className="hidden items-center gap-1.5 sm:flex">
-          <Star className="h-4 w-4 text-text-muted" />
-          <span>{formatNumber(stars)}</span>
-        </div>
-        <div className="hidden items-center gap-1.5 sm:flex">
-          <Users className="h-4 w-4 text-text-muted" />
-          <span>{formatNumber(followers)}</span>
-        </div>
+        {Object.entries(STATS).map(([name, { icon: Icon, key: statKey }]) => (
+          <div key={name} className="hidden items-center gap-1.5 sm:flex">
+            <Icon className="h-4 w-4 text-text-muted" />
+            <span>{formatNumber(ranking[statKey] as number)}</span>
+          </div>
+        ))}
       </div>
     </a>
   );

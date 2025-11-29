@@ -39,7 +39,7 @@ export function UserRankingTable() {
         isEmpty={isEmpty}
       >
         {rankings.map((ranking) => (
-          <UserRow key={ranking.id} ranking={ranking} />
+          <UserRow key={ranking.id} ranking={ranking} sort={sort} />
         ))}
       </RankingList>
     </div>
