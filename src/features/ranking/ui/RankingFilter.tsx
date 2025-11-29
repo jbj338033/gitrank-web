@@ -1,5 +1,9 @@
 'use client';
 
+import { ChevronDown } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { useClickOutside } from '@/shared/lib';
+
 interface FilterOption {
   value: string;
   label: string;
@@ -22,6 +26,13 @@ export function RankingFilter({
   onPeriodChange,
   periodOptions,
 }: RankingFilterProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useClickOutside<HTMLDivElement>(
+    useCallback(() => setIsOpen(false), [])
+  );
+
+  const selectedPeriod = periodOptions?.find((o) => o.value === period);
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex gap-1">
@@ -40,20 +51,34 @@ export function RankingFilter({
         ))}
       </div>
       {periodOptions && onPeriodChange && (
-        <div className="flex rounded-full border border-border p-0.5">
-          {periodOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => onPeriodChange(option.value)}
-              className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                period === option.value
-                  ? 'bg-surface-hover text-text-primary'
-                  : 'text-text-muted hover:text-text-primary'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm font-medium text-text-primary transition-colors hover:bg-surface-hover"
+          >
+            {selectedPeriod?.label}
+            <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {isOpen && (
+            <div className="absolute right-0 top-full z-10 mt-1 min-w-full overflow-hidden rounded-lg border border-border bg-surface py-1 shadow-lg">
+              {periodOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    onPeriodChange(option.value);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full px-3 py-1.5 text-left text-sm transition-colors hover:bg-surface-hover ${
+                    period === option.value
+                      ? 'font-medium text-text-primary'
+                      : 'text-text-muted'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

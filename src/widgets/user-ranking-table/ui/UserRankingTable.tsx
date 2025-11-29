@@ -38,6 +38,7 @@ export function UserRankingTable() {
           { value: 'daily', label: t('daily') },
           { value: 'weekly', label: t('weekly') },
           { value: 'monthly', label: t('monthly') },
+          { value: 'yearly', label: t('yearly') },
         ]}
       />
       <RankingList

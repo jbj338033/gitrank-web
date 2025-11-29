@@ -49,6 +49,7 @@
     "all": "전체",
     "daily": "일간",
     "weekly": "주간",
-    "monthly": "월간"
+    "monthly": "월간",
+    "yearly": "연간"
   }
 }
