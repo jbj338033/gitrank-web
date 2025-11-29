@@ -9,23 +9,18 @@ import { useDebounce } from '@/shared/lib/hooks';
 
 export default function MyReposPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
-  const [mounted, setMounted] = useState(false);
+  const { isAuthenticated, isHydrated } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedQuery = useDebounce(searchQuery, 300);
   const { data, isLoading, error } = useMyRepos(debouncedQuery || undefined);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (isHydrated && !isAuthenticated) {
       router.push('/users');
     }
-  }, [mounted, isAuthenticated, router]);
+  }, [isHydrated, isAuthenticated, router]);
 
-  if (!mounted || !isAuthenticated) {
+  if (!isHydrated || !isAuthenticated) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
         <div className="flex justify-center py-12">

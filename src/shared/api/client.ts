@@ -21,10 +21,6 @@ export function setTokens(access: string | null, refresh: string | null = null) 
   }
 }
 
-export function getAccessToken() {
-  return accessToken;
-}
-
 export function getRefreshToken() {
   return refreshToken;
 }

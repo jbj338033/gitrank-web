@@ -8,8 +8,7 @@ import { useSync, useUpdateVisibility, useDeleteAccount } from '@/features/user-
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
-  const [mounted, setMounted] = useState(false);
+  const { user, isAuthenticated, isHydrated } = useAuthStore();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const sync = useSync();
@@ -17,14 +16,10 @@ export default function SettingsPage() {
   const deleteAccount = useDeleteAccount();
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (isHydrated && !isAuthenticated) {
       router.push('/users');
     }
-  }, [mounted, isAuthenticated, router]);
+  }, [isHydrated, isAuthenticated, router]);
 
   useEffect(() => {
     if (deleteAccount.isSuccess) {
@@ -32,7 +27,7 @@ export default function SettingsPage() {
     }
   }, [deleteAccount.isSuccess, router]);
 
-  if (!mounted || !isAuthenticated || !user) {
+  if (!isHydrated || !isAuthenticated || !user) {
     return (
       <div className="mx-auto max-w-lg px-4 py-6">
         <div className="flex justify-center py-12">
