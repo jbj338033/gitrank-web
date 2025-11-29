@@ -21,14 +21,6 @@ export function setTokens(access: string | null, refresh: string | null = null) 
   }
 }
 
-export function setAccessToken(token: string | null) {
-  accessToken = token;
-}
-
-export function setRefreshToken(token: string | null) {
-  refreshToken = token;
-}
-
 export function getAccessToken() {
   return accessToken;
 }
@@ -95,8 +87,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         clearTokens();
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('auth-storage');
-          window.location.href = '/login';
+          window.location.href = '/users';
         }
         return Promise.reject(refreshError);
       } finally {
@@ -108,21 +99,6 @@ apiClient.interceptors.response.use(
   }
 );
 
-export interface ApiError {
-  message: string;
-  status: number;
-}
-
-export function isApiError(error: unknown): error is AxiosError<ApiError> {
+export function isApiError(error: unknown): error is AxiosError {
   return axios.isAxiosError(error);
-}
-
-export function getErrorMessage(error: unknown): string {
-  if (isApiError(error)) {
-    return error.response?.data?.message || error.message || 'An error occurred';
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return 'An unknown error occurred';
 }
