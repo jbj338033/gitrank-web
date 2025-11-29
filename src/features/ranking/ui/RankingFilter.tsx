@@ -23,8 +23,8 @@ export function RankingFilter({
   periodOptions,
 }: RankingFilterProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <div className="flex gap-2">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex gap-1">
         {sortOptions.map((option) => (
           <button
             key={option.value}
@@ -40,7 +40,7 @@ export function RankingFilter({
         ))}
       </div>
       {periodOptions && onPeriodChange && (
-        <div className="flex gap-2">
+        <div className="flex rounded-full border border-border p-0.5">
           {periodOptions.map((option) => (
             <button
               key={option.value}
