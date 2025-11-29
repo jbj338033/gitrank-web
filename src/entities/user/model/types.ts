@@ -3,21 +3,16 @@ export interface User {
   githubId: number;
   username: string;
   avatarUrl?: string;
-  totalCommits: number;
-  totalStars: number;
-  totalFollowers: number;
   visible: boolean;
-  lastSyncedAt?: string;
-  createdAt: string;
 }
 
 export interface UserRanking {
   id: string;
   username: string;
   avatarUrl?: string;
-  totalCommits: number;
-  totalStars: number;
-  totalFollowers: number;
+  commits: number;
+  stars: number;
+  followers: number;
   rank: number;
 }
 

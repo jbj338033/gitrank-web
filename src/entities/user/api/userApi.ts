@@ -5,7 +5,6 @@ import { User, UserRankingResponse } from '../model/types';
 interface UserRankingsParams {
   sort?: string;
   period?: string;
-  language?: string;
   cursor?: string;
   limit?: number;
 }
@@ -16,13 +15,16 @@ export const userApi = {
     return data;
   },
 
-  updateVisibility: async (visible: boolean): Promise<User> => {
-    const { data } = await apiClient.patch<User>(API_ENDPOINTS.USERS.VISIBILITY, { visible });
-    return data;
+  updateVisibility: async (visible: boolean): Promise<void> => {
+    await apiClient.patch(API_ENDPOINTS.USERS.VISIBILITY, { visible });
   },
 
   deleteMe: async (): Promise<void> => {
     await apiClient.delete(API_ENDPOINTS.USERS.ME);
+  },
+
+  sync: async (): Promise<void> => {
+    await apiClient.post(API_ENDPOINTS.USERS.SYNC);
   },
 
   fetchRankings: async (params: UserRankingsParams): Promise<UserRankingResponse> => {
@@ -30,9 +32,8 @@ export const userApi = {
       params: {
         sort: params.sort || 'commits',
         period: params.period || 'all',
-        language: params.language,
         cursor: params.cursor,
-        limit: params.limit || 20,
+        limit: params.limit || 30,
       },
     });
     return data;

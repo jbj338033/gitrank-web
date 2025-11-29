@@ -12,6 +12,11 @@ export interface Repo {
   createdAt: string;
 }
 
+export interface Owner {
+  username: string;
+  avatarUrl?: string;
+}
+
 export interface RepoRanking {
   id: string;
   name: string;
@@ -20,16 +25,11 @@ export interface RepoRanking {
   language?: string;
   stars: number;
   forks: number;
-  ownerUsername: string;
-  ownerAvatarUrl?: string;
+  owner: Owner;
   rank: number;
 }
 
 export interface RepoRankingResponse {
   content: RepoRanking[];
   hasNext: boolean;
-}
-
-export interface RepoListResponse {
-  repos: Repo[];
 }
