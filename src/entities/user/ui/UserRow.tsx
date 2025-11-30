@@ -17,7 +17,7 @@ interface UserRowProps {
 }
 
 export function UserRow({ ranking, sort }: UserRowProps) {
-  const { rank, username, avatarUrl } = ranking;
+  const { rank, username, avatarUrl, bio } = ranking;
   const { icon: MobileIcon, key } = STATS[sort];
 
   return (
@@ -35,9 +35,10 @@ export function UserRow({ ranking, sort }: UserRowProps) {
         height={36}
         className="rounded-full"
       />
-      <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-primary">
-        {username}
-      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-text-primary">{username}</p>
+        {bio && <p className="truncate text-xs text-text-muted">{bio}</p>}
+      </div>
       <div className="flex items-center gap-6 text-sm text-text-secondary">
         <div className="flex items-center gap-1.5 sm:hidden">
           <MobileIcon className="h-4 w-4 text-text-muted" />

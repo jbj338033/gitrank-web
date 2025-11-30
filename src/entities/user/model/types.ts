@@ -10,6 +10,7 @@ export interface UserRanking {
   id: string;
   username: string;
   avatarUrl?: string;
+  bio?: string;
   commits: number;
   stars: number;
   followers: number;
