@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/entities/user/model/types';
-import { setTokens, clearTokens } from '@/shared/api/client';
+import { setTokens, clearTokens, setTokensRefreshedCallback } from '@/shared/api/client';
 
 interface AuthState {
   user: User | null;
@@ -77,6 +77,10 @@ export const useAuthStore = create<AuthStore>()(
     }
   )
 );
+
+setTokensRefreshedCallback((accessToken, refreshToken) => {
+  useAuthStore.setState({ accessToken, refreshToken });
+});
 
 export const useUser = () => useAuthStore((state) => state.user);
 export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated);

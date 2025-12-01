@@ -13,6 +13,13 @@ let accessToken: string | null = null;
 let refreshToken: string | null = null;
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
+let onTokensRefreshed: ((accessToken: string, refreshToken: string) => void) | null = null;
+
+export function setTokensRefreshedCallback(
+  callback: (accessToken: string, refreshToken: string) => void
+) {
+  onTokensRefreshed = callback;
+}
 
 export function setTokens(access: string | null, refresh: string | null = null) {
   accessToken = access;
@@ -76,6 +83,7 @@ apiClient.interceptors.response.use(
 
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
         setTokens(newAccessToken, newRefreshToken);
+        onTokensRefreshed?.(newAccessToken, newRefreshToken);
         onTokenRefreshed(newAccessToken);
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
