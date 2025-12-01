@@ -5,11 +5,11 @@ import { GitCommitHorizontal, Star, Users, LucideIcon } from 'lucide-react';
 import { UserRanking } from '../model/types';
 import { formatNumber } from '@/shared/lib/utils';
 
-const STATS: Record<string, { icon: LucideIcon; key: keyof UserRanking }> = {
-  commits: { icon: GitCommitHorizontal, key: 'commits' },
-  stars: { icon: Star, key: 'stars' },
-  followers: { icon: Users, key: 'followers' },
-};
+const STATS: { key: keyof UserRanking; icon: LucideIcon }[] = [
+  { key: 'commits', icon: GitCommitHorizontal },
+  { key: 'stars', icon: Star },
+  { key: 'followers', icon: Users },
+];
 
 interface UserRowProps {
   ranking: UserRanking;
@@ -18,7 +18,7 @@ interface UserRowProps {
 
 export function UserRow({ ranking, sort }: UserRowProps) {
   const { rank, username, avatarUrl, bio } = ranking;
-  const { icon: MobileIcon, key } = STATS[sort];
+  const currentStat = STATS.find((s) => s.key === sort) ?? STATS[0];
 
   return (
     <a
@@ -41,13 +41,13 @@ export function UserRow({ ranking, sort }: UserRowProps) {
       </div>
       <div className="flex items-center gap-6 text-sm text-text-secondary">
         <div className="flex items-center gap-1.5 sm:hidden">
-          <MobileIcon className="h-4 w-4 text-text-muted" />
-          <span>{formatNumber(ranking[key] as number)}</span>
+          <currentStat.icon className="h-4 w-4 text-text-muted" />
+          <span>{formatNumber(ranking[currentStat.key] as number)}</span>
         </div>
-        {Object.entries(STATS).map(([name, { icon: Icon, key: statKey }]) => (
-          <div key={name} className="hidden items-center gap-1.5 sm:flex">
+        {STATS.map(({ key, icon: Icon }) => (
+          <div key={key} className="hidden items-center gap-1.5 sm:flex">
             <Icon className="h-4 w-4 text-text-muted" />
-            <span>{formatNumber(ranking[statKey] as number)}</span>
+            <span>{formatNumber(ranking[key] as number)}</span>
           </div>
         ))}
       </div>

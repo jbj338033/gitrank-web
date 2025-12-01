@@ -2,7 +2,7 @@ import { apiClient } from '@/shared/api/client';
 import { API_ENDPOINTS } from '@/shared/config/constants';
 import { User, UserRankingResponse } from '../model/types';
 
-interface UserRankingsParams {
+interface FetchRankingsParams {
   sort?: string;
   period?: string;
   cursor?: string;
@@ -10,32 +10,19 @@ interface UserRankingsParams {
 }
 
 export const userApi = {
-  getMe: async (): Promise<User> => {
-    const { data } = await apiClient.get<User>(API_ENDPOINTS.USERS.ME);
-    return data;
-  },
+  getMe: () => apiClient.get<User>(API_ENDPOINTS.USERS.ME).then((res) => res.data),
 
-  updateVisibility: async (visible: boolean): Promise<void> => {
-    await apiClient.patch(API_ENDPOINTS.USERS.VISIBILITY, { visible });
-  },
+  updateVisibility: (visible: boolean) =>
+    apiClient.patch(API_ENDPOINTS.USERS.VISIBILITY, { visible }),
 
-  deleteMe: async (): Promise<void> => {
-    await apiClient.delete(API_ENDPOINTS.USERS.ME);
-  },
+  deleteMe: () => apiClient.delete(API_ENDPOINTS.USERS.ME),
 
-  sync: async (): Promise<void> => {
-    await apiClient.post(API_ENDPOINTS.USERS.SYNC);
-  },
+  sync: () => apiClient.post(API_ENDPOINTS.USERS.SYNC),
 
-  fetchRankings: async (params: UserRankingsParams): Promise<UserRankingResponse> => {
-    const { data } = await apiClient.get<UserRankingResponse>(API_ENDPOINTS.RANKINGS.USERS, {
-      params: {
-        sort: params.sort || 'commits',
-        period: params.period || 'all',
-        cursor: params.cursor,
-        limit: params.limit || 30,
-      },
-    });
-    return data;
-  },
+  fetchRankings: ({ sort = 'commits', period = 'all', cursor, limit = 30 }: FetchRankingsParams) =>
+    apiClient
+      .get<UserRankingResponse>(API_ENDPOINTS.RANKINGS.USERS, {
+        params: { sort, period, cursor, limit },
+      })
+      .then((res) => res.data),
 };

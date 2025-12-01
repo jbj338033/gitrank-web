@@ -3,26 +3,12 @@
 import { Check, Star, GitFork, Loader2 } from 'lucide-react';
 import { Repo } from '@/entities/repo';
 import { formatNumber } from '@/shared/lib/utils';
+import { LANGUAGE_COLORS } from '@/shared/config/constants';
 import { useUpdateRepoRegister } from '../api/registerApi';
 
 interface RepoRegisterListProps {
   repos: Repo[];
 }
-
-const languageColors: Record<string, string> = {
-  JavaScript: '#f1e05a',
-  TypeScript: '#3178c6',
-  Python: '#3572a5',
-  Java: '#b07219',
-  Go: '#00add8',
-  Rust: '#dea584',
-  'C++': '#f34b7d',
-  C: '#555555',
-  Ruby: '#701516',
-  PHP: '#4f5d95',
-  Swift: '#f05138',
-  Kotlin: '#a97bff',
-};
 
 export function RepoRegisterList({ repos }: RepoRegisterListProps) {
   const { mutate, isPending, variables } = useUpdateRepoRegister();
@@ -76,7 +62,7 @@ export function RepoRegisterList({ repos }: RepoRegisterListProps) {
                   <div className="flex shrink-0 items-center gap-1">
                     <span
                       className="h-2.5 w-2.5 rounded-full"
-                      style={{ backgroundColor: languageColors[repo.language] ?? '#6b6b6b' }}
+                      style={{ backgroundColor: LANGUAGE_COLORS[repo.language] ?? '#6b6b6b' }}
                     />
                     <span className="text-xs text-text-muted">{repo.language}</span>
                   </div>

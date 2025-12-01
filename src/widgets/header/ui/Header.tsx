@@ -6,25 +6,27 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, Settings, FolderGit2, Globe } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useAuthStore, LoginButton, authApi } from '@/features/auth';
+import { useAuthStore, useIsHydrated, LoginButton, authApi } from '@/features/auth';
 import { cn, getGitHubAvatarUrl, useClickOutside } from '@/shared/lib';
+
+const NAV_LINKS = [
+  { href: '/users', key: 'nav.users' },
+  { href: '/repos', key: 'nav.repos' },
+] as const;
 
 export function Header() {
   const t = useTranslations();
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isAuthenticated, isHydrated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const isHydrated = useIsHydrated();
   const [isOpen, setIsOpen] = useState(false);
-
-  const dropdownRef = useClickOutside<HTMLDivElement>(
-    useCallback(() => setIsOpen(false), [])
-  );
+  const dropdownRef = useClickOutside<HTMLDivElement>(useCallback(() => setIsOpen(false), []));
 
   const handleLogout = async () => {
     try {
       await authApi.logout();
-    } catch {
     } finally {
       logout();
       setIsOpen(false);
@@ -33,19 +35,13 @@ export function Header() {
   };
 
   const toggleLocale = async () => {
-    const newLocale = locale === 'ko' ? 'en' : 'ko';
     await fetch('/api/locale', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ locale: newLocale }),
+      body: JSON.stringify({ locale: locale === 'ko' ? 'en' : 'ko' }),
     });
     router.refresh();
   };
-
-  const navLinks = [
-    { href: '/users', label: t('nav.users') },
-    { href: '/repos', label: t('nav.repos') },
-  ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-md">
@@ -58,18 +54,16 @@ export function Header() {
           </Link>
 
           <div className="hidden items-center gap-4 sm:flex">
-            {navLinks.map((link) => (
+            {NAV_LINKS.map(({ href, key }) => (
               <Link
-                key={link.href}
-                href={link.href}
+                key={href}
+                href={href}
                 className={cn(
                   'text-sm font-medium transition-colors',
-                  pathname === link.href
-                    ? 'text-text-primary'
-                    : 'text-text-muted hover:text-text-primary'
+                  pathname === href ? 'text-text-primary' : 'text-text-muted hover:text-text-primary'
                 )}
               >
-                {link.label}
+                {t(key)}
               </Link>
             ))}
           </div>
@@ -88,7 +82,7 @@ export function Header() {
             <div className="h-8 w-8 animate-pulse rounded-full bg-surface" />
           ) : isAuthenticated && user ? (
             <div className="relative" ref={dropdownRef}>
-              <button onClick={() => setIsOpen(!isOpen)}>
+              <button onClick={() => setIsOpen((prev) => !prev)}>
                 <Image
                   src={getGitHubAvatarUrl(user.username)}
                   alt={user.username}

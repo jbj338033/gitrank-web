@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, X, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useAuthStore } from '@/features/auth';
+import { useAuthStore, useIsHydrated } from '@/features/auth';
 import { useMyRepos, RepoRegisterList } from '@/features/repo-register';
 import { useDebounce } from '@/shared/lib/hooks';
 
@@ -12,7 +12,8 @@ export default function MyReposPage() {
   const t = useTranslations('myRepos');
   const tc = useTranslations('common');
   const router = useRouter();
-  const { isAuthenticated, isHydrated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
+  const isHydrated = useIsHydrated();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedQuery = useDebounce(searchQuery, 300);
   const { data, isLoading, error } = useMyRepos(debouncedQuery || undefined);

@@ -23,38 +23,41 @@ export const authApi = {
     return `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}`;
   },
 
-  exchangeCodeStream: (code: string, callbacks: AuthEventCallback) => {
-    const url = `${API_URL}${API_ENDPOINTS.AUTH.GITHUB_CALLBACK}?code=${code}`;
-    const eventSource = new EventSource(url, { withCredentials: true });
+  exchangeCodeStream: (code: string, { onProgress, onComplete, onError }: AuthEventCallback) => {
+    const eventSource = new EventSource(
+      `${API_URL}${API_ENDPOINTS.AUTH.GITHUB_CALLBACK}?code=${code}`,
+      { withCredentials: true }
+    );
 
     eventSource.onmessage = (e) => {
       try {
         const event = JSON.parse(e.data);
-        if (event.type === 'progress') {
-          callbacks.onProgress(event.step);
-        } else if (event.type === 'complete') {
-          callbacks.onComplete(event.data);
-          eventSource.close();
-        } else if (event.type === 'error') {
-          callbacks.onError(event.error);
-          eventSource.close();
+        switch (event.type) {
+          case 'progress':
+            onProgress(event.step);
+            break;
+          case 'complete':
+            onComplete(event.data);
+            eventSource.close();
+            break;
+          case 'error':
+            onError(event.error);
+            eventSource.close();
+            break;
         }
       } catch {
-        callbacks.onError('Failed to parse response');
+        onError('Failed to parse response');
         eventSource.close();
       }
     };
 
     eventSource.onerror = () => {
-      callbacks.onError('Connection failed');
+      onError('Connection failed');
       eventSource.close();
     };
 
     return () => eventSource.close();
   },
 
-  logout: async (): Promise<void> => {
-    const refreshToken = getRefreshToken();
-    await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken });
-  },
+  logout: () => apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken: getRefreshToken() }),
 };

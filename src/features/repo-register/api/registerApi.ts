@@ -5,7 +5,7 @@ import { QUERY_STALE_TIME } from '@/shared/config/constants';
 const QUERY_KEY = ['my', 'repos'] as const;
 
 export function useMyRepos(query?: string) {
-  return useQuery<Repo[]>({
+  return useQuery({
     queryKey: [...QUERY_KEY, query],
     queryFn: () => repoApi.fetchMyRepos(query),
     staleTime: QUERY_STALE_TIME.USER_INFO,
@@ -23,26 +23,19 @@ export function useUpdateRepoRegister() {
       await queryClient.cancelQueries({ queryKey: QUERY_KEY });
       const previousData = queryClient.getQueriesData<Repo[]>({ queryKey: QUERY_KEY });
 
-      queryClient.setQueriesData<Repo[]>({ queryKey: QUERY_KEY }, (old) => {
-        if (!old) return old;
-        return old.map((repo) => (repo.id === id ? { ...repo, registered } : repo));
-      });
+      queryClient.setQueriesData<Repo[]>({ queryKey: QUERY_KEY }, (old) =>
+        old?.map((repo) => (repo.id === id ? { ...repo, registered } : repo))
+      );
 
       return { previousData };
     },
 
-    onError: (_error, _variables, context) => {
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
-          if (data) {
-            queryClient.setQueryData(queryKey, data);
-          }
-        });
-      }
+    onError: (_, __, context) => {
+      context?.previousData.forEach(([key, data]) => {
+        if (data) queryClient.setQueryData(key, data);
+      });
     },
 
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
   });
 }

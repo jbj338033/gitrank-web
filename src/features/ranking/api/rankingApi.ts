@@ -1,29 +1,24 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { userApi, UserRankingResponse } from '@/entities/user';
-import { repoApi, RepoRankingResponse } from '@/entities/repo';
+import { userApi } from '@/entities/user';
+import { repoApi } from '@/entities/repo';
 import { QUERY_STALE_TIME } from '@/shared/config/constants';
+
+const getNextPageParam = <T extends { id: string }>(lastPage: { hasNext: boolean; content: T[] }) =>
+  lastPage.hasNext && lastPage.content.length > 0
+    ? lastPage.content[lastPage.content.length - 1].id
+    : undefined;
 
 interface UseUserRankingsParams {
   sort?: string;
   period?: string;
 }
 
-export function useUserRankings(params: UseUserRankingsParams = {}) {
-  const { sort = 'commits', period = 'all' } = params;
-
+export function useUserRankings({ sort = 'commits', period = 'all' }: UseUserRankingsParams = {}) {
   return useInfiniteQuery({
     queryKey: ['rankings', 'users', { sort, period }] as const,
-    queryFn: ({ pageParam }) =>
-      userApi.fetchRankings({
-        sort,
-        period,
-        cursor: pageParam,
-      }),
+    queryFn: ({ pageParam }) => userApi.fetchRankings({ sort, period, cursor: pageParam }),
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => {
-      if (!lastPage.hasNext || lastPage.content.length === 0) return undefined;
-      return lastPage.content[lastPage.content.length - 1].id;
-    },
+    getNextPageParam,
     staleTime: QUERY_STALE_TIME.RANKINGS,
     refetchOnMount: false,
   });
@@ -33,21 +28,12 @@ interface UseRepoRankingsParams {
   sort?: string;
 }
 
-export function useRepoRankings(params: UseRepoRankingsParams = {}) {
-  const { sort = 'stars' } = params;
-
+export function useRepoRankings({ sort = 'stars' }: UseRepoRankingsParams = {}) {
   return useInfiniteQuery({
     queryKey: ['rankings', 'repos', { sort }] as const,
-    queryFn: ({ pageParam }) =>
-      repoApi.fetchRankings({
-        sort,
-        cursor: pageParam,
-      }),
+    queryFn: ({ pageParam }) => repoApi.fetchRankings({ sort, cursor: pageParam }),
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => {
-      if (!lastPage.hasNext || lastPage.content.length === 0) return undefined;
-      return lastPage.content[lastPage.content.length - 1].id;
-    },
+    getNextPageParam,
     staleTime: QUERY_STALE_TIME.RANKINGS,
     refetchOnMount: false,
   });

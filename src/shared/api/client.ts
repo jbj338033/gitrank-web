@@ -9,21 +9,21 @@ export const apiClient = axios.create({
   },
 });
 
+type TokenRefreshCallback = (accessToken: string, refreshToken: string) => void;
+
 let accessToken: string | null = null;
 let refreshToken: string | null = null;
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
-let onTokensRefreshed: ((accessToken: string, refreshToken: string) => void) | null = null;
+let onTokensRefreshed: TokenRefreshCallback | null = null;
 
-export function setTokensRefreshedCallback(
-  callback: (accessToken: string, refreshToken: string) => void
-) {
+export function setTokensRefreshedCallback(callback: TokenRefreshCallback) {
   onTokensRefreshed = callback;
 }
 
-export function setTokens(access: string | null, refresh: string | null = null) {
+export function setTokens(access: string | null, refresh?: string | null) {
   accessToken = access;
-  if (refresh !== null) {
+  if (refresh !== undefined) {
     refreshToken = refresh;
   }
 }
@@ -35,15 +35,6 @@ export function getRefreshToken() {
 export function clearTokens() {
   accessToken = null;
   refreshToken = null;
-}
-
-function subscribeTokenRefresh(callback: (token: string) => void) {
-  refreshSubscribers.push(callback);
-}
-
-function onTokenRefreshed(token: string) {
-  refreshSubscribers.forEach((callback) => callback(token));
-  refreshSubscribers = [];
 }
 
 apiClient.interceptors.request.use(
@@ -61,48 +52,45 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (error.response?.status === 401 && !originalRequest._retry && refreshToken) {
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          subscribeTokenRefresh((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(apiClient(originalRequest));
-          });
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        const response = await axios.post(
-          `${API_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
-          { refreshToken },
-          { withCredentials: true }
-        );
-
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
-        setTokens(newAccessToken, newRefreshToken);
-        onTokensRefreshed?.(newAccessToken, newRefreshToken);
-        onTokenRefreshed(newAccessToken);
-
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return apiClient(originalRequest);
-      } catch (refreshError) {
-        clearTokens();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/users';
-        }
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
+    if (error.response?.status !== 401 || originalRequest._retry || !refreshToken) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    if (isRefreshing) {
+      return new Promise((resolve) => {
+        refreshSubscribers.push((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          resolve(apiClient(originalRequest));
+        });
+      });
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const { data } = await axios.post(
+        `${API_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
+        { refreshToken },
+        { withCredentials: true }
+      );
+
+      setTokens(data.accessToken, data.refreshToken);
+      onTokensRefreshed?.(data.accessToken, data.refreshToken);
+
+      refreshSubscribers.forEach((cb) => cb(data.accessToken));
+      refreshSubscribers = [];
+
+      originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+      return apiClient(originalRequest);
+    } catch {
+      clearTokens();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/users';
+      }
+      throw error;
+    } finally {
+      isRefreshing = false;
+    }
   }
 );
-
-export function isApiError(error: unknown): error is AxiosError {
-  return axios.isAxiosError(error);
-}

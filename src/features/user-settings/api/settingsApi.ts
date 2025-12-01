@@ -23,10 +23,8 @@ export function useUpdateVisibility() {
   const updateUser = useAuthStore((state) => state.updateUser);
 
   return useMutation({
-    mutationFn: (visible: boolean) => userApi.updateVisibility(visible),
-    onSuccess: (_, visible) => {
-      updateUser({ visible });
-    },
+    mutationFn: userApi.updateVisibility,
+    onSuccess: (_, visible) => updateUser({ visible }),
   });
 }
 
@@ -34,9 +32,7 @@ export function useDeleteAccount() {
   const logout = useAuthStore((state) => state.logout);
 
   return useMutation({
-    mutationFn: () => userApi.deleteMe(),
-    onSuccess: () => {
-      logout();
-    },
+    mutationFn: userApi.deleteMe,
+    onSuccess: logout,
   });
 }

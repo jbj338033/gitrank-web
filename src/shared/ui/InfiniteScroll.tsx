@@ -8,46 +8,26 @@ interface InfiniteScrollProps {
   onLoadMore: () => void;
   hasMore: boolean;
   isLoading: boolean;
-  loader?: ReactNode;
 }
 
-export function InfiniteScroll({
-  children,
-  onLoadMore,
-  hasMore,
-  isLoading,
-  loader,
-}: InfiniteScrollProps) {
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+export function InfiniteScroll({ children, onLoadMore, hasMore, isLoading }: InfiniteScrollProps) {
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
+    const el = loadMoreRef.current;
+    if (!el) return;
 
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !isLoading) {
           onLoadMore();
         }
       },
-      {
-        root: null,
-        rootMargin: '100px',
-        threshold: 0,
-      }
+      { rootMargin: '100px' }
     );
 
-    if (loadMoreRef.current) {
-      observerRef.current.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [hasMore, isLoading, onLoadMore]);
 
   return (
@@ -56,7 +36,7 @@ export function InfiniteScroll({
       <div ref={loadMoreRef} className="h-1" />
       {isLoading && hasMore && (
         <div className="flex justify-center py-4">
-          {loader ?? <Loader2 className="h-6 w-6 animate-spin text-accent" />}
+          <Loader2 className="h-6 w-6 animate-spin text-accent" />
         </div>
       )}
     </div>

@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useAuthStore } from '@/features/auth';
+import { useAuthStore, useIsHydrated } from '@/features/auth';
 import { useSync, useUpdateVisibility, useDeleteAccount } from '@/features/user-settings';
 
 export default function SettingsPage() {
   const t = useTranslations('settings');
   const tc = useTranslations('common');
   const router = useRouter();
-  const { user, isAuthenticated, isHydrated } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
+  const isHydrated = useIsHydrated();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const sync = useSync();
@@ -19,16 +20,10 @@ export default function SettingsPage() {
   const deleteAccount = useDeleteAccount();
 
   useEffect(() => {
-    if (isHydrated && !isAuthenticated) {
+    if ((isHydrated && !isAuthenticated) || deleteAccount.isSuccess) {
       router.push('/users');
     }
-  }, [isHydrated, isAuthenticated, router]);
-
-  useEffect(() => {
-    if (deleteAccount.isSuccess) {
-      router.push('/users');
-    }
-  }, [deleteAccount.isSuccess, router]);
+  }, [isHydrated, isAuthenticated, deleteAccount.isSuccess, router]);
 
   if (!isHydrated || !isAuthenticated || !user) {
     return (

@@ -33,22 +33,12 @@ export function RankingList({
   }
 
   if (isEmpty) {
-    return (
-      <div className="py-12 text-center text-sm text-text-muted">
-        {t('noResults')}
-      </div>
-    );
+    return <div className="py-12 text-center text-sm text-text-muted">{t('noResults')}</div>;
   }
 
   return (
-    <InfiniteScroll
-      onLoadMore={onLoadMore}
-      hasMore={hasMore}
-      isLoading={isFetchingNextPage}
-    >
-      <div className="divide-y divide-border rounded-lg border border-border">
-        {children}
-      </div>
+    <InfiniteScroll onLoadMore={onLoadMore} hasMore={hasMore} isLoading={isFetchingNextPage}>
+      <div className="divide-y divide-border rounded-lg border border-border">{children}</div>
     </InfiniteScroll>
   );
 }
