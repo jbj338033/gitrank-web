@@ -1,9 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { UserRow } from '@/entities/user';
-import { useUserRankings, RankingFilter, RankingList } from '@/features/ranking';
+import {
+  useUserRankings,
+  usePrefetchUserRankings,
+  RankingFilter,
+  RankingList,
+} from '@/features/ranking';
+
+const SORT_OPTIONS = ['commits', 'stars', 'followers'] as const;
 
 export function UserRankingTable() {
   const t = useTranslations('ranking');
@@ -17,6 +24,26 @@ export function UserRankingTable() {
     isFetchingNextPage,
     isLoading,
   } = useUserRankings({ sort, period });
+
+  const prefetch = usePrefetchUserRankings();
+
+  useEffect(() => {
+    SORT_OPTIONS.forEach((s) => {
+      if (s !== sort) {
+        prefetch({ sort: s, period });
+      }
+    });
+  }, [period, sort, prefetch]);
+
+  const handlePrefetchSort = useCallback(
+    (newSort: string) => prefetch({ sort: newSort, period }),
+    [period, prefetch]
+  );
+
+  const handlePrefetchPeriod = useCallback(
+    (newPeriod: string) => prefetch({ sort, period: newPeriod }),
+    [sort, prefetch]
+  );
 
   const rankings = data?.pages.flatMap((page) => page.content) ?? [];
   const isEmpty = !isLoading && rankings.length === 0;
@@ -40,6 +67,8 @@ export function UserRankingTable() {
           { value: 'monthly', label: t('monthly') },
           { value: 'yearly', label: t('yearly') },
         ]}
+        onPrefetchSort={handlePrefetchSort}
+        onPrefetchPeriod={handlePrefetchPeriod}
       />
       <RankingList
         onLoadMore={fetchNextPage}

@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, Settings, FolderGit2, Globe } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuthStore, useIsHydrated, LoginButton, authApi } from '@/features/auth';
+import { usePrefetchUserRankings, usePrefetchRepoRankings } from '@/features/ranking';
 import { cn, getGitHubAvatarUrl, useClickOutside } from '@/shared/lib';
 
 const NAV_LINKS = [
@@ -23,6 +24,20 @@ export function Header() {
   const isHydrated = useIsHydrated();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useClickOutside<HTMLDivElement>(useCallback(() => setIsOpen(false), []));
+
+  const prefetchUserRankings = usePrefetchUserRankings();
+  const prefetchRepoRankings = usePrefetchRepoRankings();
+
+  const handleNavPrefetch = useCallback(
+    (href: string) => {
+      if (href === '/users' && pathname !== '/users') {
+        prefetchUserRankings({ sort: 'commits', period: 'all' });
+      } else if (href === '/repos' && pathname !== '/repos') {
+        prefetchRepoRankings({ sort: 'stars' });
+      }
+    },
+    [pathname, prefetchUserRankings, prefetchRepoRankings]
+  );
 
   const handleLogout = async () => {
     try {
@@ -58,6 +73,7 @@ export function Header() {
               <Link
                 key={href}
                 href={href}
+                onMouseEnter={() => handleNavPrefetch(href)}
                 className={cn(
                   'text-sm font-medium transition-colors',
                   pathname === href ? 'text-text-primary' : 'text-text-muted hover:text-text-primary'

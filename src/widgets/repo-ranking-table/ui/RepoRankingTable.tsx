@@ -1,9 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { RepoRow } from '@/entities/repo';
-import { useRepoRankings, RankingFilter, RankingList } from '@/features/ranking';
+import {
+  useRepoRankings,
+  usePrefetchRepoRankings,
+  RankingFilter,
+  RankingList,
+} from '@/features/ranking';
+
+const SORT_OPTIONS = ['stars', 'forks'] as const;
 
 export function RepoRankingTable() {
   const t = useTranslations('ranking');
@@ -17,6 +24,21 @@ export function RepoRankingTable() {
     isLoading,
   } = useRepoRankings({ sort });
 
+  const prefetch = usePrefetchRepoRankings();
+
+  useEffect(() => {
+    SORT_OPTIONS.forEach((s) => {
+      if (s !== sort) {
+        prefetch({ sort: s });
+      }
+    });
+  }, [sort, prefetch]);
+
+  const handlePrefetchSort = useCallback(
+    (newSort: string) => prefetch({ sort: newSort }),
+    [prefetch]
+  );
+
   const rankings = data?.pages.flatMap((page) => page.content) ?? [];
   const isEmpty = !isLoading && rankings.length === 0;
 
@@ -29,6 +51,7 @@ export function RepoRankingTable() {
           { value: 'stars', label: t('stars') },
           { value: 'forks', label: t('forks') },
         ]}
+        onPrefetchSort={handlePrefetchSort}
       />
       <RankingList
         onLoadMore={fetchNextPage}

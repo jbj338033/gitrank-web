@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDown } from 'lucide-react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useClickOutside } from '@/shared/lib';
 
 interface FilterOption {
@@ -16,6 +16,8 @@ interface RankingFilterProps {
   period?: string;
   onPeriodChange?: (value: string) => void;
   periodOptions?: FilterOption[];
+  onPrefetchSort?: (sort: string) => void;
+  onPrefetchPeriod?: (period: string) => void;
 }
 
 export function RankingFilter({
@@ -25,11 +27,23 @@ export function RankingFilter({
   period,
   onPeriodChange,
   periodOptions,
+  onPrefetchSort,
+  onPrefetchPeriod,
 }: RankingFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useClickOutside<HTMLDivElement>(useCallback(() => setIsOpen(false), []));
 
   const selectedPeriod = periodOptions?.find((o) => o.value === period);
+
+  useEffect(() => {
+    if (isOpen && onPrefetchPeriod && periodOptions) {
+      periodOptions.forEach(({ value }) => {
+        if (value !== period) {
+          onPrefetchPeriod(value);
+        }
+      });
+    }
+  }, [isOpen, onPrefetchPeriod, periodOptions, period]);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -38,6 +52,7 @@ export function RankingFilter({
           <button
             key={value}
             onClick={() => onSortChange(value)}
+            onMouseEnter={() => value !== sort && onPrefetchSort?.(value)}
             className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
               sort === value ? 'bg-accent text-white' : 'text-text-muted hover:text-text-primary'
             }`}
