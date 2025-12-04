@@ -14,6 +14,8 @@ export interface UserRanking {
   commits: number;
   stars: number;
   followers: number;
+  currentStreak: number;
+  longestStreak: number;
   rank: number;
 }
 

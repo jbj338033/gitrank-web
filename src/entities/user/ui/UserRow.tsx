@@ -1,15 +1,21 @@
 'use client';
 
 import Image from 'next/image';
-import { GitCommitHorizontal, Star, Users, LucideIcon } from 'lucide-react';
+import { GitCommitHorizontal, Star, Users, Flame, LucideIcon } from 'lucide-react';
 import { UserRanking } from '../model/types';
 import { formatNumber } from '@/shared/lib/utils';
 
-const STATS: { key: keyof UserRanking; icon: LucideIcon }[] = [
-  { key: 'commits', icon: GitCommitHorizontal },
-  { key: 'stars', icon: Star },
-  { key: 'followers', icon: Users },
-];
+type StatKey = 'commits' | 'stars' | 'followers' | 'streak';
+
+const STAT_CONFIG: Record<StatKey, { key: keyof UserRanking; icon: LucideIcon }> = {
+  commits: { key: 'commits', icon: GitCommitHorizontal },
+  stars: { key: 'stars', icon: Star },
+  followers: { key: 'followers', icon: Users },
+  streak: { key: 'currentStreak', icon: Flame },
+};
+
+const DEFAULT_STATS: StatKey[] = ['commits', 'stars', 'followers'];
+const STREAK_STATS: StatKey[] = ['streak'];
 
 interface UserRowProps {
   ranking: UserRanking;
@@ -18,7 +24,9 @@ interface UserRowProps {
 
 export function UserRow({ ranking, sort }: UserRowProps) {
   const { rank, username, avatarUrl, bio } = ranking;
-  const currentStat = STATS.find((s) => s.key === sort) ?? STATS[0];
+  const isStreakSort = sort === 'streak';
+  const stats = isStreakSort ? STREAK_STATS : DEFAULT_STATS;
+  const currentStat = STAT_CONFIG[sort as StatKey] ?? STAT_CONFIG.commits;
 
   return (
     <a
@@ -44,12 +52,15 @@ export function UserRow({ ranking, sort }: UserRowProps) {
           <currentStat.icon className="h-4 w-4 text-text-muted" />
           <span>{formatNumber(ranking[currentStat.key] as number)}</span>
         </div>
-        {STATS.map(({ key, icon: Icon }) => (
-          <div key={key} className="hidden items-center gap-1.5 sm:flex">
-            <Icon className="h-4 w-4 text-text-muted" />
-            <span>{formatNumber(ranking[key] as number)}</span>
-          </div>
-        ))}
+        {stats.map((statKey) => {
+          const { key, icon: Icon } = STAT_CONFIG[statKey];
+          return (
+            <div key={statKey} className="hidden items-center gap-1.5 sm:flex">
+              <Icon className="h-4 w-4 text-text-muted" />
+              <span>{formatNumber(ranking[key] as number)}</span>
+            </div>
+          );
+        })}
       </div>
     </a>
   );
