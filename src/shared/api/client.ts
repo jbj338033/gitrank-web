@@ -47,20 +47,43 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+}
+
+function onRefreshFailed() {
+  refreshSubscribers.forEach((cb) => cb(''));
+  refreshSubscribers = [];
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (error.response?.status !== 401 || originalRequest._retry || !refreshToken) {
+    if (error.response?.status !== 401 || originalRequest._retry) {
+      return Promise.reject(error);
+    }
+
+    if (!refreshToken) {
       return Promise.reject(error);
     }
 
     if (isRefreshing) {
-      return new Promise((resolve) => {
-        refreshSubscribers.push((token) => {
+      return new Promise((resolve, reject) => {
+        subscribeTokenRefresh((token) => {
+          if (!token) {
+            reject(error);
+            return;
+          }
           originalRequest.headers.Authorization = `Bearer ${token}`;
-          resolve(apiClient(originalRequest));
+          originalRequest._retry = true;
+          resolve(apiClient.request(originalRequest));
         });
       });
     }
@@ -77,18 +100,17 @@ apiClient.interceptors.response.use(
 
       setTokens(data.accessToken, data.refreshToken);
       onTokensRefreshed?.(data.accessToken, data.refreshToken);
-
-      refreshSubscribers.forEach((cb) => cb(data.accessToken));
-      refreshSubscribers = [];
+      onRefreshed(data.accessToken);
 
       originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-      return apiClient(originalRequest);
-    } catch {
+      return apiClient.request(originalRequest);
+    } catch (refreshError) {
+      onRefreshFailed();
       clearTokens();
       if (typeof window !== 'undefined') {
         window.location.href = '/users';
       }
-      throw error;
+      return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
     }
