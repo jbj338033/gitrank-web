@@ -23,10 +23,11 @@ interface UserRowProps {
 }
 
 export function UserRow({ ranking, sort }: UserRowProps) {
-  const { rank, username, avatarUrl, bio } = ranking;
+  const { rank, username, name, avatarUrl, bio } = ranking;
   const isStreakSort = sort === 'streak';
   const stats = isStreakSort ? STREAK_STATS : DEFAULT_STATS;
   const currentStat = STAT_CONFIG[sort as StatKey] ?? STAT_CONFIG.commits;
+  const displayName = name || username;
 
   return (
     <a
@@ -44,7 +45,12 @@ export function UserRow({ ranking, sort }: UserRowProps) {
         className="rounded-full"
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-text-primary">{username}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="truncate text-sm font-medium text-text-primary">{displayName}</p>
+          {name && (
+            <span className="shrink-0 text-xs text-text-muted">@{username}</span>
+          )}
+        </div>
         {bio && <p className="truncate text-xs text-text-muted">{bio}</p>}
       </div>
       <div className="flex items-center gap-6 text-sm text-text-secondary">

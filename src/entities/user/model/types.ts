@@ -9,6 +9,7 @@ export interface User {
 export interface UserRanking {
   id: string;
   username: string;
+  name?: string;
   avatarUrl?: string;
   bio?: string;
   commits: number;
