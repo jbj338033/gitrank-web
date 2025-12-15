@@ -1,14 +1,11 @@
-'use client';
-
 import { useState, useCallback } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { LogOut, Settings, FolderGit2, Globe } from 'lucide-react';
-import { useTranslations, useLocale } from 'next-intl';
-import { useAuthStore, useIsHydrated, LoginButton, authApi } from '@/features/auth';
+import { useTranslation } from 'react-i18next';
+import { useAuthStore, useIsHydrated, authApi } from '@/features/auth';
 import { usePrefetchUserRankings, usePrefetchRepoRankings } from '@/features/ranking';
 import { cn, getGitHubAvatarUrl, useClickOutside } from '@/shared/lib';
+import { changeLanguage } from '@/app/i18n';
 
 const NAV_LINKS = [
   { href: '/users', key: 'nav.users' },
@@ -16,10 +13,9 @@ const NAV_LINKS = [
 ] as const;
 
 export function Header() {
-  const t = useTranslations();
-  const locale = useLocale();
-  const pathname = usePathname();
-  const router = useRouter();
+  const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
   const isHydrated = useIsHydrated();
   const [isOpen, setIsOpen] = useState(false);
@@ -30,13 +26,13 @@ export function Header() {
 
   const handleNavPrefetch = useCallback(
     (href: string) => {
-      if (href === '/users' && pathname !== '/users') {
+      if (href === '/users' && location.pathname !== '/users') {
         prefetchUserRankings({ sort: 'commits', period: 'all' });
-      } else if (href === '/repos' && pathname !== '/repos') {
+      } else if (href === '/repos' && location.pathname !== '/repos') {
         prefetchRepoRankings({ sort: 'stars' });
       }
     },
-    [pathname, prefetchUserRankings, prefetchRepoRankings]
+    [location.pathname, prefetchUserRankings, prefetchRepoRankings]
   );
 
   const handleLogout = async () => {
@@ -45,25 +41,21 @@ export function Header() {
     } finally {
       logout();
       setIsOpen(false);
-      router.push('/users');
+      navigate({ to: '/login' });
     }
   };
 
-  const toggleLocale = async () => {
-    await fetch('/api/locale', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ locale: locale === 'ko' ? 'en' : 'ko' }),
-    });
-    router.refresh();
+  const toggleLocale = () => {
+    const newLocale = i18n.language === 'ko' ? 'en' : 'ko';
+    changeLanguage(newLocale);
   };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/90 backdrop-blur-md">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            <span className="bg-linear-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+          <Link to="/" className="text-lg font-semibold tracking-tight">
+            <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
               GitRank
             </span>
           </Link>
@@ -72,11 +64,13 @@ export function Header() {
             {NAV_LINKS.map(({ href, key }) => (
               <Link
                 key={href}
-                href={href}
+                to={href}
                 onMouseEnter={() => handleNavPrefetch(href)}
                 className={cn(
                   'text-sm font-medium transition-colors',
-                  pathname === href ? 'text-text-primary' : 'text-text-muted hover:text-text-primary'
+                  location.pathname === href
+                    ? 'text-text-primary'
+                    : 'text-text-muted hover:text-text-primary'
                 )}
               >
                 {t(key)}
@@ -91,7 +85,7 @@ export function Header() {
             className="flex items-center gap-1 text-sm text-text-muted transition-colors hover:text-text-primary"
           >
             <Globe className="h-4 w-4" />
-            <span className="uppercase">{locale}</span>
+            <span className="uppercase">{i18n.language}</span>
           </button>
 
           {!isHydrated ? (
@@ -99,7 +93,7 @@ export function Header() {
           ) : isAuthenticated && user ? (
             <div className="relative" ref={dropdownRef}>
               <button onClick={() => setIsOpen((prev) => !prev)}>
-                <Image
+                <img
                   src={getGitHubAvatarUrl(user.username)}
                   alt={user.username}
                   width={32}
@@ -115,7 +109,7 @@ export function Header() {
                   </div>
                   <div className="py-1">
                     <Link
-                      href="/my/repos"
+                      to="/my/repos"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
                     >
@@ -123,7 +117,7 @@ export function Header() {
                       {t('header.myRepos')}
                     </Link>
                     <Link
-                      href="/settings"
+                      to="/settings"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
                     >
@@ -144,7 +138,12 @@ export function Header() {
               )}
             </div>
           ) : (
-            <LoginButton />
+            <Link
+              to="/login"
+              className="flex items-center gap-2 text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
+            >
+              {t('auth.signIn')}
+            </Link>
           )}
         </div>
       </nav>

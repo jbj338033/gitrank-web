@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
 

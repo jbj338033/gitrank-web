@@ -1,6 +1,5 @@
-import { apiClient } from '@/shared/api/client';
-import { API_ENDPOINTS } from '@/shared/config/constants';
-import { User, UserRankingResponse } from '../model/types';
+import { apiClient } from '@/shared/api';
+import type { User, UserRankingResponse } from '../model/types';
 
 interface FetchRankingsParams {
   sort?: string;
@@ -10,18 +9,17 @@ interface FetchRankingsParams {
 }
 
 export const userApi = {
-  getMe: () => apiClient.get<User>(API_ENDPOINTS.USERS.ME).then((res) => res.data),
+  getMe: () => apiClient.get<User>('/api/v1/users/me').then((res) => res.data),
 
-  updateVisibility: (visible: boolean) =>
-    apiClient.patch(API_ENDPOINTS.USERS.VISIBILITY, { visible }),
+  updateVisibility: (visible: boolean) => apiClient.patch('/api/v1/users/me/visibility', { visible }),
 
-  deleteMe: () => apiClient.delete(API_ENDPOINTS.USERS.ME),
+  deleteMe: () => apiClient.delete('/api/v1/users/me'),
 
-  sync: () => apiClient.post(API_ENDPOINTS.USERS.SYNC),
+  sync: () => apiClient.post('/api/v1/users/me/sync'),
 
   fetchRankings: ({ sort = 'commits', period = 'all', cursor, limit = 30 }: FetchRankingsParams) =>
     apiClient
-      .get<UserRankingResponse>(API_ENDPOINTS.RANKINGS.USERS, {
+      .get<UserRankingResponse>('/api/v1/rankings/users', {
         params: { sort, period, cursor, limit },
       })
       .then((res) => res.data),

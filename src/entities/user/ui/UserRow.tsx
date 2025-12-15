@@ -1,9 +1,6 @@
-'use client';
-
-import Image from 'next/image';
 import { GitCommitHorizontal, Star, Users, Flame, LucideIcon } from 'lucide-react';
-import { UserRanking } from '../model/types';
-import { formatNumber } from '@/shared/lib/utils';
+import type { UserRanking } from '../model/types';
+import { formatNumber } from '@/shared/lib';
 
 type StatKey = 'commits' | 'stars' | 'followers' | 'streak';
 
@@ -37,7 +34,7 @@ export function UserRow({ ranking, sort }: UserRowProps) {
       className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-surface-hover"
     >
       <span className="w-6 text-center text-sm text-text-muted">{rank}</span>
-      <Image
+      <img
         src={avatarUrl || `https://github.com/${username}.png?size=80`}
         alt={username}
         width={36}
@@ -47,9 +44,7 @@ export function UserRow({ ranking, sort }: UserRowProps) {
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <p className="truncate text-sm font-medium text-text-primary">{displayName}</p>
-          {name && (
-            <span className="shrink-0 text-xs text-text-muted">@{username}</span>
-          )}
+          {name && <span className="shrink-0 text-xs text-text-muted">@{username}</span>}
         </div>
         {bio && <p className="truncate text-xs text-text-muted">{bio}</p>}
       </div>

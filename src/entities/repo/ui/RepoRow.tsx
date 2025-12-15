@@ -1,9 +1,7 @@
-'use client';
-
 import { Star, GitFork, LucideIcon } from 'lucide-react';
-import { RepoRanking } from '../model/types';
-import { formatNumber } from '@/shared/lib/utils';
-import { LANGUAGE_COLORS } from '@/shared/config/constants';
+import type { RepoRanking } from '../model/types';
+import { formatNumber } from '@/shared/lib';
+import { LANGUAGE_COLORS } from '@/shared/config';
 
 const STATS: { key: keyof RepoRanking; icon: LucideIcon }[] = [
   { key: 'stars', icon: Star },

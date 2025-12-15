@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, RefObject } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -11,10 +11,8 @@ export function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-export function useClickOutside<T extends HTMLElement>(
-  callback: () => void
-): RefObject<T | null> {
-  const ref = useRef<T | null>(null);
+export function useClickOutside<T extends HTMLElement>(callback: () => void) {
+  const ref = useRef<T>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

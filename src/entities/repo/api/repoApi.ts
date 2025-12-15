@@ -1,6 +1,5 @@
-import { apiClient } from '@/shared/api/client';
-import { API_ENDPOINTS } from '@/shared/config/constants';
-import { Repo, RepoRankingResponse } from '../model/types';
+import { apiClient } from '@/shared/api';
+import type { Repo, RepoRankingResponse } from '../model/types';
 
 interface FetchRankingsParams {
   sort?: string;
@@ -11,14 +10,14 @@ interface FetchRankingsParams {
 export const repoApi = {
   fetchRankings: ({ sort = 'stars', cursor, limit = 30 }: FetchRankingsParams) =>
     apiClient
-      .get<RepoRankingResponse>(API_ENDPOINTS.RANKINGS.REPOS, {
+      .get<RepoRankingResponse>('/api/v1/rankings/repos', {
         params: { sort, cursor, limit },
       })
       .then((res) => res.data),
 
   fetchMyRepos: (query?: string) =>
-    apiClient.get<Repo[]>(API_ENDPOINTS.REPOS.ME, { params: { query } }).then((res) => res.data),
+    apiClient.get<Repo[]>('/api/v1/repos/me', { params: { query } }).then((res) => res.data),
 
   updateRegister: (id: string, registered: boolean) =>
-    apiClient.patch(API_ENDPOINTS.REPOS.REGISTER(id), { registered }),
+    apiClient.patch(`/api/v1/repos/${id}/register`, { registered }),
 };

@@ -1,10 +1,8 @@
-'use client';
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useEffect, useState } from 'react';
-import { User } from '@/entities/user/model/types';
-import { setTokens, clearTokens, setTokensRefreshedCallback } from '@/shared/api/client';
+import type { User } from '@/entities/user';
+import { setAuthStore } from '@/shared/api';
 
 interface AuthState {
   user: User | null;
@@ -18,64 +16,61 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
 
       login: (accessToken, refreshToken, user) => {
-        setTokens(accessToken, refreshToken);
         set({ accessToken, refreshToken, user, isAuthenticated: true });
       },
 
       logout: () => {
-        clearTokens();
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
       },
 
       updateUser: (userData) => {
-        const user = get().user;
-        if (user) set({ user: { ...user, ...userData } });
+        set((state) => ({
+          user: state.user ? { ...state.user, ...userData } : null,
+        }));
       },
     }),
     {
       name: 'auth-storage',
-      partialize: ({ user, accessToken, refreshToken, isAuthenticated }) => ({
-        user,
-        accessToken,
-        refreshToken,
-        isAuthenticated,
-      }),
       onRehydrateStorage: () => (state) => {
-        if (state?.accessToken && state?.refreshToken) {
-          setTokens(state.accessToken, state.refreshToken);
+        if (state) {
+          setAuthStore({
+            get accessToken() { return useAuthStore.getState().accessToken; },
+            get refreshToken() { return useAuthStore.getState().refreshToken; },
+            set accessToken(v) { useAuthStore.setState({ accessToken: v }); },
+            set refreshToken(v) { useAuthStore.setState({ refreshToken: v }); },
+            logout: useAuthStore.getState().logout,
+          });
         }
       },
     }
   )
 );
 
-setTokensRefreshedCallback((accessToken, refreshToken) => {
-  useAuthStore.setState({ accessToken, refreshToken });
+setAuthStore({
+  get accessToken() { return useAuthStore.getState().accessToken; },
+  get refreshToken() { return useAuthStore.getState().refreshToken; },
+  set accessToken(v) { useAuthStore.setState({ accessToken: v }); },
+  set refreshToken(v) { useAuthStore.setState({ refreshToken: v }); },
+  logout: useAuthStore.getState().logout,
 });
 
-// Zustand v5 persist hydration hook
 export function useIsHydrated() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // 이미 hydrated된 경우
     if (useAuthStore.persist.hasHydrated()) {
       setHydrated(true);
       return;
     }
 
-    // hydration 완료 대기
-    const unsub = useAuthStore.persist.onFinishHydration(() => {
-      setHydrated(true);
-    });
-
+    const unsub = useAuthStore.persist.onFinishHydration(() => setHydrated(true));
     return unsub;
   }, []);
 

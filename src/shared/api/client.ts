@@ -1,116 +1,61 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { API_URL, API_ENDPOINTS } from '@/shared/config/constants';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8888';
 
 export const apiClient = axios.create({
   baseURL: API_URL,
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
-type TokenRefreshCallback = (accessToken: string, refreshToken: string) => void;
+type AuthStore = {
+  accessToken: string | null;
+  refreshToken: string | null;
+  logout: () => void;
+};
 
-let accessToken: string | null = null;
-let refreshToken: string | null = null;
+let authStore: AuthStore | null = null;
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
-let onTokensRefreshed: TokenRefreshCallback | null = null;
 
-export function setTokensRefreshedCallback(callback: TokenRefreshCallback) {
-  onTokensRefreshed = callback;
-}
+export const setAuthStore = (store: AuthStore) => {
+  authStore = store;
+};
 
-export function setTokens(access: string | null, refresh?: string | null) {
-  accessToken = access;
-  if (refresh !== undefined) {
-    refreshToken = refresh;
+apiClient.interceptors.request.use((config) => {
+  if (authStore?.accessToken) {
+    config.headers.Authorization = `Bearer ${authStore.accessToken}`;
   }
-}
-
-export function getRefreshToken() {
-  return refreshToken;
-}
-
-export function clearTokens() {
-  accessToken = null;
-  refreshToken = null;
-}
-
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-function subscribeTokenRefresh(cb: (token: string) => void) {
-  refreshSubscribers.push(cb);
-}
-
-function onRefreshed(token: string) {
-  refreshSubscribers.forEach((cb) => cb(token));
-  refreshSubscribers = [];
-}
-
-function onRefreshFailed() {
-  refreshSubscribers.forEach((cb) => cb(''));
-  refreshSubscribers = [];
-}
+  return config;
+});
 
 apiClient.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+  (res) => res,
+  async (error) => {
+    const original = error.config;
 
-    if (error.response?.status !== 401 || originalRequest._retry) {
+    if (error.response?.status !== 401 || original._retry || !authStore?.refreshToken) {
       return Promise.reject(error);
     }
 
-    if (!refreshToken) {
-      return Promise.reject(error);
-    }
+    if (isRefreshing) return Promise.reject(error);
 
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        subscribeTokenRefresh((token) => {
-          if (!token) {
-            reject(error);
-            return;
-          }
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          originalRequest._retry = true;
-          resolve(apiClient.request(originalRequest));
-        });
-      });
-    }
-
-    originalRequest._retry = true;
+    original._retry = true;
     isRefreshing = true;
 
     try {
-      const { data } = await axios.post(
-        `${API_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
-        { refreshToken },
-        { withCredentials: true }
-      );
+      const { data } = await axios.post(`${API_URL}/api/v1/auth/refresh`, {
+        refreshToken: authStore.refreshToken,
+      });
 
-      setTokens(data.accessToken, data.refreshToken);
-      onTokensRefreshed?.(data.accessToken, data.refreshToken);
-      onRefreshed(data.accessToken);
+      authStore.accessToken = data.accessToken;
+      authStore.refreshToken = data.refreshToken;
 
-      originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-      return apiClient.request(originalRequest);
-    } catch (refreshError) {
-      onRefreshFailed();
-      clearTokens();
-      if (typeof window !== 'undefined') {
-        window.location.href = '/users';
-      }
-      return Promise.reject(refreshError);
+      original.headers.Authorization = `Bearer ${data.accessToken}`;
+      return apiClient.request(original);
+    } catch {
+      authStore.logout();
+      window.location.href = '/login';
+      return Promise.reject(error);
     } finally {
       isRefreshing = false;
     }

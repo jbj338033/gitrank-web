@@ -1,7 +1,5 @@
-'use client';
-
 import { useState, useCallback, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslation } from 'react-i18next';
 import { UserRow } from '@/entities/user';
 import {
   useUserRankings,
@@ -14,19 +12,16 @@ const SORT_OPTIONS = ['commits', 'stars', 'followers', 'streak'] as const;
 const PERIOD_OPTIONS = ['all', 'daily', 'weekly', 'monthly', 'yearly'] as const;
 
 export function UserRankingTable() {
-  const t = useTranslations('ranking');
+  const { t } = useTranslation();
   const [sort, setSort] = useState('commits');
   const [period, setPeriod] = useState('all');
 
   const queryPeriod = sort === 'commits' ? period : 'all';
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = useUserRankings({ sort, period: queryPeriod });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useUserRankings({
+    sort,
+    period: queryPeriod,
+  });
 
   const prefetch = usePrefetchUserRankings();
 
@@ -63,15 +58,15 @@ export function UserRankingTable() {
   const isEmpty = !isLoading && rankings.length === 0;
 
   const sortOptions = [
-    { value: 'commits', label: t('commits') },
-    { value: 'stars', label: t('stars') },
-    { value: 'followers', label: t('followers') },
-    { value: 'streak', label: t('streak') },
+    { value: 'commits', label: t('ranking.commits') },
+    { value: 'stars', label: t('ranking.stars') },
+    { value: 'followers', label: t('ranking.followers') },
+    { value: 'streak', label: t('ranking.streak') },
   ];
 
   const periodOptions = PERIOD_OPTIONS.map((value) => ({
     value,
-    label: t(value),
+    label: t(`ranking.${value}`),
   }));
 
   return (

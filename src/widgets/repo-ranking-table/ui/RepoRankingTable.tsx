@@ -1,7 +1,5 @@
-'use client';
-
 import { useState, useCallback, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslation } from 'react-i18next';
 import { RepoRow } from '@/entities/repo';
 import {
   useRepoRankings,
@@ -13,16 +11,12 @@ import {
 const SORT_OPTIONS = ['stars', 'forks'] as const;
 
 export function RepoRankingTable() {
-  const t = useTranslations('ranking');
+  const { t } = useTranslation();
   const [sort, setSort] = useState('stars');
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = useRepoRankings({ sort });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useRepoRankings({
+    sort,
+  });
 
   const prefetch = usePrefetchRepoRankings();
 
@@ -48,8 +42,8 @@ export function RepoRankingTable() {
         sort={sort}
         onSortChange={setSort}
         sortOptions={[
-          { value: 'stars', label: t('stars') },
-          { value: 'forks', label: t('forks') },
+          { value: 'stars', label: t('ranking.stars') },
+          { value: 'forks', label: t('ranking.forks') },
         ]}
         onPrefetchSort={handlePrefetchSort}
       />
