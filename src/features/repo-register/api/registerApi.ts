@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { repoApi, Repo } from '@/entities/repo';
-import { QUERY_STALE_TIME } from '@/shared/config/constants';
+import { QUERY_STALE_TIME } from '@/shared/config';
 
 const QUERY_KEY = ['my', 'repos'] as const;
 

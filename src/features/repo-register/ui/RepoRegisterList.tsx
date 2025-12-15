@@ -1,9 +1,7 @@
-'use client';
-
 import { Check, Star, GitFork, Loader2 } from 'lucide-react';
-import { Repo } from '@/entities/repo';
-import { formatNumber } from '@/shared/lib/utils';
-import { LANGUAGE_COLORS } from '@/shared/config/constants';
+import type { Repo } from '@/entities/repo';
+import { formatNumber } from '@/shared/lib';
+import { LANGUAGE_COLORS } from '@/shared/config';
 import { useUpdateRepoRegister } from '../api/registerApi';
 
 interface RepoRegisterListProps {
@@ -28,10 +26,7 @@ export function RepoRegisterList({ repos }: RepoRegisterListProps) {
         const isUpdating = pendingId === repo.id;
 
         return (
-          <div
-            key={repo.id}
-            className="flex items-center gap-3 px-4 py-3"
-          >
+          <div key={repo.id} className="flex items-center gap-3 px-4 py-3">
             <button
               onClick={() => handleToggle(repo)}
               disabled={isUpdating}
@@ -69,9 +64,7 @@ export function RepoRegisterList({ repos }: RepoRegisterListProps) {
                 )}
               </div>
               {repo.description && (
-                <p className="mt-0.5 truncate text-xs text-text-muted">
-                  {repo.description}
-                </p>
+                <p className="mt-0.5 truncate text-xs text-text-muted">{repo.description}</p>
               )}
             </div>
 
