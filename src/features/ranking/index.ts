@@ -1,3 +1,4 @@
+export type { UseUserRankingsParams, UseRepoRankingsParams, FilterOption } from './model/types';
 export {
   useUserRankings,
   useRepoRankings,

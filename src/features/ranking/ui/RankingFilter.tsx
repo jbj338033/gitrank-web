@@ -1,13 +1,7 @@
-'use client';
-
 import { ChevronDown } from 'lucide-react';
 import { useState, useCallback, useEffect } from 'react';
 import { useClickOutside } from '@/shared/lib';
-
-interface FilterOption {
-  value: string;
-  label: string;
-}
+import type { FilterOption } from '../model/types';
 
 interface RankingFilterProps {
   sort: string;

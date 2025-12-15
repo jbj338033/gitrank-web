@@ -2,17 +2,13 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { userApi } from '@/entities/user';
 import { repoApi } from '@/entities/repo';
-import { QUERY_STALE_TIME } from '@/shared/config/constants';
+import { QUERY_STALE_TIME } from '@/shared/config';
+import type { UseUserRankingsParams, UseRepoRankingsParams } from '../model/types';
 
 const getNextPageParam = <T extends { id: string }>(lastPage: { hasNext: boolean; content: T[] }) =>
   lastPage.hasNext && lastPage.content.length > 0
     ? lastPage.content[lastPage.content.length - 1].id
     : undefined;
-
-interface UseUserRankingsParams {
-  sort?: string;
-  period?: string;
-}
 
 export function useUserRankings({ sort = 'commits', period = 'all' }: UseUserRankingsParams = {}) {
   return useInfiniteQuery({
@@ -23,10 +19,6 @@ export function useUserRankings({ sort = 'commits', period = 'all' }: UseUserRan
     staleTime: QUERY_STALE_TIME.RANKINGS,
     refetchOnMount: false,
   });
-}
-
-interface UseRepoRankingsParams {
-  sort?: string;
 }
 
 export function useRepoRankings({ sort = 'stars' }: UseRepoRankingsParams = {}) {

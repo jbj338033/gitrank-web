@@ -1,8 +1,6 @@
-'use client';
-
 import { ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslation } from 'react-i18next';
 import { InfiniteScroll } from '@/shared/ui';
 
 interface RankingListProps {
@@ -22,7 +20,7 @@ export function RankingList({
   isFetchingNextPage,
   isEmpty,
 }: RankingListProps) {
-  const t = useTranslations('ranking');
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -33,7 +31,7 @@ export function RankingList({
   }
 
   if (isEmpty) {
-    return <div className="py-12 text-center text-sm text-text-muted">{t('noResults')}</div>;
+    return <div className="py-12 text-center text-sm text-text-muted">{t('ranking.noResults')}</div>;
   }
 
   return (
