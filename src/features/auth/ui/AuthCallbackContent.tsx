@@ -1,18 +1,20 @@
-'use client';
-
 import { useEffect, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useNavigate } from '@tanstack/react-router';
 import { Loader2, Check } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../model/authStore';
-import { authApi, AuthStep } from '../api/authApi';
+import { authApi, type AuthStep } from '../api/authApi';
 
 const STEPS: AuthStep[] = ['authenticating', 'syncing'];
 
-export function AuthCallbackContent() {
-  const t = useTranslations();
-  const router = useRouter();
-  const searchParams = useSearchParams();
+interface AuthCallbackContentProps {
+  code: string | undefined;
+  error: string | undefined;
+}
+
+export function AuthCallbackContent({ code, error: authError }: AuthCallbackContentProps) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const { login } = useAuthStore();
   const hasStarted = useRef(false);
   const [currentStep, setCurrentStep] = useState<AuthStep>('authenticating');
@@ -24,11 +26,8 @@ export function AuthCallbackContent() {
   };
 
   useEffect(() => {
-    const code = searchParams.get('code');
-    const authError = searchParams.get('error');
-
     if (authError || !code) {
-      router.push('/users');
+      navigate({ to: '/login' });
       return;
     }
 
@@ -39,16 +38,16 @@ export function AuthCallbackContent() {
       onProgress: (step) => setCurrentStep(step),
       onComplete: ({ accessToken, refreshToken, user }) => {
         login(accessToken, refreshToken, user);
-        router.push('/users');
+        navigate({ to: '/users' });
       },
       onError: (err) => {
         setError(err);
-        setTimeout(() => router.push('/users'), 2000);
+        setTimeout(() => navigate({ to: '/login' }), 2000);
       },
     });
 
     return cleanup;
-  }, [searchParams, login, router]);
+  }, [code, authError, login, navigate]);
 
   const currentStepIndex = STEPS.indexOf(currentStep);
 
