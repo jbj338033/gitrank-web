@@ -2,8 +2,8 @@ import { apiClient } from '@/shared/api';
 import type { User } from '@/entities/user';
 import { useAuthStore } from '../model/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8888';
-const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID ?? '';
+const API_URL = import.meta.env.VITE_API_URL;
+const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID;
 
 export type AuthStep = 'authenticating' | 'syncing';
 
