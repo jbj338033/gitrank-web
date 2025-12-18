@@ -62,17 +62,12 @@ setAuthStore({
 });
 
 export function useIsHydrated() {
-  const [hydrated, setHydrated] = useState(false);
+  const [hydrated, setHydrated] = useState(() => useAuthStore.persist.hasHydrated());
 
   useEffect(() => {
-    if (useAuthStore.persist.hasHydrated()) {
-      setHydrated(true);
-      return;
-    }
-
-    const unsub = useAuthStore.persist.onFinishHydration(() => setHydrated(true));
-    return unsub;
-  }, []);
+    if (hydrated) return;
+    return useAuthStore.persist.onFinishHydration(() => setHydrated(true));
+  }, [hydrated]);
 
   return hydrated;
 }
