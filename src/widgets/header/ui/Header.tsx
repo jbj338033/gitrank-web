@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { LogOut, Settings, FolderGit2, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore, useIsHydrated, authApi } from '@/features/auth';
+import { useAuthStore, authApi } from '@/features/auth';
 import { usePrefetchUserRankings, usePrefetchRepoRankings } from '@/features/ranking';
 import { cn, getGitHubAvatarUrl, useClickOutside } from '@/shared/lib';
 import { changeLanguage } from '@/app/i18n';
@@ -17,7 +17,6 @@ export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const isHydrated = useIsHydrated();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useClickOutside<HTMLDivElement>(useCallback(() => setIsOpen(false), []));
 
@@ -88,9 +87,7 @@ export function Header() {
             <span className="uppercase">{i18n.language}</span>
           </button>
 
-          {!isHydrated ? (
-            <div className="h-8 w-8 animate-pulse rounded-full bg-surface" />
-          ) : isAuthenticated && user ? (
+          {isAuthenticated && user ? (
             <div className="relative" ref={dropdownRef}>
               <button onClick={() => setIsOpen((prev) => !prev)}>
                 <img

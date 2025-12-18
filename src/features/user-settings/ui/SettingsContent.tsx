@@ -3,14 +3,13 @@ import { useNavigate } from '@tanstack/react-router';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { useAuthStore, useIsHydrated } from '@/features/auth';
+import { useAuthStore } from '@/features/auth';
 import { useSync, useUpdateVisibility, useDeleteAccount } from '../api/settingsApi';
 
 export function SettingsContent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
-  const isHydrated = useIsHydrated();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const sync = useSync();
@@ -18,12 +17,12 @@ export function SettingsContent() {
   const deleteAccount = useDeleteAccount();
 
   useEffect(() => {
-    if (isHydrated && !isAuthenticated) {
+    if (!isAuthenticated) {
       navigate({ to: '/login' });
     } else if (deleteAccount.isSuccess) {
       navigate({ to: '/users' });
     }
-  }, [isHydrated, isAuthenticated, deleteAccount.isSuccess, navigate]);
+  }, [isAuthenticated, deleteAccount.isSuccess, navigate]);
 
   const handleSync = () => {
     sync.mutate(undefined, {
@@ -45,7 +44,7 @@ export function SettingsContent() {
     });
   };
 
-  if (!isHydrated || !isAuthenticated || !user) {
+  if (!isAuthenticated || !user) {
     return (
       <div className="mx-auto max-w-lg px-4 py-6">
         <div className="flex justify-center py-12">

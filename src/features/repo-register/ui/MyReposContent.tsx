@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Search, X, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore, useIsHydrated } from '@/features/auth';
+import { useIsAuthenticated } from '@/features/auth';
 import { useDebounce } from '@/shared/lib';
 import { useMyRepos } from '../api/registerApi';
 import { RepoRegisterList } from './RepoRegisterList';
@@ -10,19 +10,18 @@ import { RepoRegisterList } from './RepoRegisterList';
 export function MyReposContent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuthStore();
-  const isHydrated = useIsHydrated();
+  const isAuthenticated = useIsAuthenticated();
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedQuery = useDebounce(searchQuery, 300);
   const { data, isLoading, error } = useMyRepos(debouncedQuery || undefined);
 
   useEffect(() => {
-    if (isHydrated && !isAuthenticated) {
+    if (!isAuthenticated) {
       navigate({ to: '/login' });
     }
-  }, [isHydrated, isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate]);
 
-  if (!isHydrated || !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
         <div className="flex justify-center py-12">

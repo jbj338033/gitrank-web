@@ -2,28 +2,25 @@ import { useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Github } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore, useIsHydrated } from '../model/authStore';
+import { useIsAuthenticated } from '../model/authStore';
 
 const GITHUB_CLIENT_ID = import.meta.env.VITE_GITHUB_CLIENT_ID ?? '';
 
 export function LoginContent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const isHydrated = useIsHydrated();
+  const isAuthenticated = useIsAuthenticated();
 
   useEffect(() => {
-    if (isHydrated && isAuthenticated) {
+    if (isAuthenticated) {
       navigate({ to: '/users' });
     }
-  }, [isHydrated, isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = () => {
     const redirectUri = `${window.location.origin}/auth/callback`;
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}`;
   };
-
-  if (!isHydrated) return null;
 
   return (
     <div className="flex flex-col items-center gap-8">

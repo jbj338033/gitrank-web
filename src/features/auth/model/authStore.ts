@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { useEffect, useState } from 'react';
 import type { User } from '@/entities/user';
 import { setAuthStore } from '@/shared/api';
 
@@ -36,20 +35,7 @@ export const useAuthStore = create<AuthState>()(
         }));
       },
     }),
-    {
-      name: 'auth-storage',
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          setAuthStore({
-            get accessToken() { return useAuthStore.getState().accessToken; },
-            get refreshToken() { return useAuthStore.getState().refreshToken; },
-            set accessToken(v) { useAuthStore.setState({ accessToken: v }); },
-            set refreshToken(v) { useAuthStore.setState({ refreshToken: v }); },
-            logout: useAuthStore.getState().logout,
-          });
-        }
-      },
-    }
+    { name: 'auth-storage' }
   )
 );
 
@@ -58,19 +44,8 @@ setAuthStore({
   get refreshToken() { return useAuthStore.getState().refreshToken; },
   set accessToken(v) { useAuthStore.setState({ accessToken: v }); },
   set refreshToken(v) { useAuthStore.setState({ refreshToken: v }); },
-  logout: useAuthStore.getState().logout,
+  logout: () => useAuthStore.getState().logout(),
 });
-
-export function useIsHydrated() {
-  const [hydrated, setHydrated] = useState(() => useAuthStore.persist.hasHydrated());
-
-  useEffect(() => {
-    if (hydrated) return;
-    return useAuthStore.persist.onFinishHydration(() => setHydrated(true));
-  }, [hydrated]);
-
-  return hydrated;
-}
 
 export const useUser = () => useAuthStore((s) => s.user);
 export const useIsAuthenticated = () => useAuthStore((s) => s.isAuthenticated);
