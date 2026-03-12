@@ -156,18 +156,16 @@ function ReposPage() {
                         owner: r.full_name.split("/")[0],
                         repo: r.full_name.split("/")[1],
                       }}
-                      className="group"
+                      className="flex items-center gap-3"
                     >
-                      <div className="flex items-center gap-3">
-                        {r.owner.avatar_url && (
-                          <img src={r.owner.avatar_url} alt="" className="h-7 w-7 rounded-full" />
+                      {r.owner.avatar_url && (
+                        <img src={r.owner.avatar_url} alt="" className="h-8 w-8 rounded-full" />
+                      )}
+                      <div className="min-w-0">
+                        <div className="font-medium text-zinc-100">{r.full_name}</div>
+                        {r.description && (
+                          <div className="max-w-xs truncate text-xs text-zinc-500 lg:max-w-md">{r.description}</div>
                         )}
-                        <div className="min-w-0">
-                          <div className="font-medium text-zinc-100">{r.full_name}</div>
-                          {r.description && (
-                            <div className="max-w-xs truncate text-xs text-zinc-500 lg:max-w-md">{r.description}</div>
-                          )}
-                        </div>
                       </div>
                     </Link>
                   </td>
