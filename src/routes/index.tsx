@@ -15,7 +15,8 @@ function LandingPage() {
 
   const topUsers = userData?.pages[0]?.users.slice(0, 5) ?? [];
   const topRepos = repoData?.pages[0]?.repositories.slice(0, 5) ?? [];
-  const topStreaks = streakData?.pages[0]?.users.slice(0, 5).filter((u) => u.current_streak > 0) ?? [];
+  const streakLoading = !streakData;
+  const topStreaks = streakData?.pages[0]?.users.slice(0, 5) ?? [];
 
   return (
     <div className="space-y-10">
@@ -132,16 +133,20 @@ function LandingPage() {
               {t("home.topStreaks")}
             </h2>
             <Link
-              to="/users"
+              to="/streaks"
               className="text-xs text-zinc-600 transition-colors hover:text-zinc-400"
             >
               {t("home.viewAll")}
             </Link>
           </div>
           <div className="rounded-lg border border-zinc-800/50 bg-zinc-900/30">
-            {topStreaks.length === 0 ? (
+            {streakLoading ? (
               <div className="flex h-40 items-center justify-center">
                 <div className="h-4 w-32 animate-pulse rounded bg-zinc-800" />
+              </div>
+            ) : topStreaks.length === 0 ? (
+              <div className="flex h-40 items-center justify-center text-sm text-zinc-600">
+                {t("home.noStreaks")}
               </div>
             ) : (
               topStreaks.map((u, i) => (
@@ -154,7 +159,7 @@ function LandingPage() {
                   }`}
                 >
                   <span className="w-5 text-center text-xs font-medium tabular-nums text-zinc-600">
-                    {i + 1}
+                    {u.rank}
                   </span>
                   {u.avatar_url && (
                     <img

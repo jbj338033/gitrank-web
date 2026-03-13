@@ -15,6 +15,7 @@ const ko = {
     topRepos: "상위 저장소",
     topStreaks: "상위 스트릭",
     viewAll: "전체 보기",
+    noStreaks: "스트릭 데이터가 없습니다",
   },
   login: {
     title: "GitHub 활동 기반 개발자 랭킹",
@@ -96,6 +97,7 @@ const en: typeof ko = {
     topRepos: "Top Repositories",
     topStreaks: "Top Streaks",
     viewAll: "View all",
+    noStreaks: "No streak data yet",
   },
   login: {
     title: "Developer ranking based on GitHub activity",
