@@ -11,7 +11,7 @@ async function redirectToGitHub() {
   sessionStorage.setItem("oauth_state", state);
   const params = new URLSearchParams({
     client_id: GITHUB_CLIENT_ID,
-    scope: "read:user repo",
+    scope: "read:user read:repo",
     state,
   });
   window.location.href = `https://github.com/login/oauth/authorize?${params}`;
