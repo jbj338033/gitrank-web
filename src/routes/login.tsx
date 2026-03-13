@@ -45,6 +45,11 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const loginCalled = useRef(false);
 
+  const invalidOAuthState = !!(code && state) && (() => {
+    const saved = sessionStorage.getItem("oauth_state");
+    return !saved || saved !== state;
+  })();
+
   const handleStatus = useCallback(
     (status: { step: string; message: string }) => {
       setSteps((prev) => {
@@ -69,11 +74,7 @@ function LoginPage() {
   useEffect(() => {
     if (!code || !state) return;
     if (loginCalled.current) return;
-    const saved = sessionStorage.getItem("oauth_state");
-    if (!saved || saved !== state) {
-      setError("invalid oauth state");
-      return;
-    }
+    if (invalidOAuthState) return;
     loginCalled.current = true;
     sessionStorage.removeItem("oauth_state");
 
@@ -88,7 +89,7 @@ function LoginPage() {
         setError(err.message ?? "login failed");
         setTimeout(() => navigate({ to: "/users" }), 2000);
       });
-  }, [code, state, navigate, qc, handleStatus]);
+  }, [code, state, invalidOAuthState, navigate, qc, handleStatus]);
 
   if (code) {
     return (
@@ -99,7 +100,7 @@ function LoginPage() {
               <span className="font-light">git</span>
               <span className="font-bold">rank</span>
             </h1>
-            {error ? (
+            {error || invalidOAuthState ? (
               <p className="mt-2 text-sm text-red-400">{t("login.failed")}</p>
             ) : steps.length === 0 ? (
               <p className="mt-2 text-sm text-zinc-500">
@@ -107,7 +108,7 @@ function LoginPage() {
               </p>
             ) : null}
           </div>
-          {steps.length === 0 && !error ? (
+          {steps.length === 0 && !error && !invalidOAuthState ? (
             <div className="flex justify-center py-6">
               <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-accent-400" />
             </div>
@@ -141,9 +142,9 @@ function LoginPage() {
               ))}
             </div>
           )}
-          {error && (
+          {(error || invalidOAuthState) && (
             <p className="mt-4 rounded-lg bg-red-500/5 px-4 py-2.5 text-center text-sm text-red-400">
-              {error}
+              {error ?? "invalid oauth state"}
             </p>
           )}
         </div>

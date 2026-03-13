@@ -6,6 +6,7 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import { userApi } from "./api";
+import { ApiHttpError } from "../../shared/api/client";
 
 export function useMe() {
   return useQuery({
@@ -36,7 +37,7 @@ export function useUserDetail(username: string) {
 
 export function useSyncUser(username: string) {
   const qc = useQueryClient();
-  return useMutation({
+  return useMutation<{ synced_at: string }, ApiHttpError>({
     mutationFn: () => userApi.sync(username),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["user", username] });

@@ -6,6 +6,7 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import { repoApi } from "./api";
+import { ApiHttpError } from "../../shared/api/client";
 
 export function useRepoRanking(sort: string, language: string) {
   return useInfiniteQuery({
@@ -33,16 +34,9 @@ export function useRepoDetail(owner: string, repo: string) {
 
 export function useToggleRepoVisibility() {
   const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      owner,
-      repo,
-      isPublic,
-    }: {
-      owner: string;
-      repo: string;
-      isPublic: boolean;
-    }) => repoApi.toggleVisibility(owner, repo, isPublic),
+  return useMutation<{ is_public: boolean }, ApiHttpError, { owner: string; repo: string; isPublic: boolean }>({
+    mutationFn: ({ owner, repo, isPublic }) =>
+      repoApi.toggleVisibility(owner, repo, isPublic),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["myRepos"] });
       qc.invalidateQueries({ queryKey: ["user"] });
