@@ -4,6 +4,7 @@ import { initReactI18next } from "react-i18next";
 const ko = {
   nav: {
     users: "유저",
+    streaks: "스트릭",
     repos: "저장소",
     profile: "프로필",
     logout: "로그아웃",
@@ -12,7 +13,9 @@ const ko = {
   home: {
     topUsers: "상위 유저",
     topRepos: "상위 저장소",
+    topStreaks: "상위 스트릭",
     viewAll: "전체 보기",
+    noStreaks: "스트릭 데이터가 없습니다",
   },
   login: {
     title: "GitHub 활동 기반 개발자 랭킹",
@@ -37,8 +40,17 @@ const ko = {
     sync: "데이터 동기화",
     syncFailed: "동기화에 실패했습니다",
     contributions: "기여 활동",
+    currentStreak: "현재 스트릭",
+    longestStreak: "최장 스트릭",
+    streakRank: "스트릭 순위",
     myRepos: "내 저장소",
     topRepos: "상위 저장소",
+  },
+  streakRanking: {
+    title: "스트릭 랭킹",
+    empty: "아직 스트릭 데이터가 없습니다",
+    start: "로그인하여 시작하기",
+    user: "유저",
   },
   repoRanking: {
     title: "저장소 랭킹",
@@ -63,6 +75,8 @@ const ko = {
     stars: "스타",
     forks: "포크",
     watchers: "워처",
+    current_streak: "현재 스트릭",
+    longest_streak: "최장 스트릭",
   },
   table: {
     year: "연도",
@@ -72,6 +86,7 @@ const ko = {
 const en: typeof ko = {
   nav: {
     users: "Users",
+    streaks: "Streaks",
     repos: "Repos",
     profile: "Profile",
     logout: "Logout",
@@ -80,7 +95,9 @@ const en: typeof ko = {
   home: {
     topUsers: "Top Users",
     topRepos: "Top Repositories",
+    topStreaks: "Top Streaks",
     viewAll: "View all",
+    noStreaks: "No streak data yet",
   },
   login: {
     title: "Developer ranking based on GitHub activity",
@@ -105,8 +122,17 @@ const en: typeof ko = {
     sync: "Sync data",
     syncFailed: "Sync failed",
     contributions: "Contributions",
+    currentStreak: "Current Streak",
+    longestStreak: "Longest Streak",
+    streakRank: "Streak Rank",
     myRepos: "My Repositories",
     topRepos: "Top Repositories",
+  },
+  streakRanking: {
+    title: "Streak Rankings",
+    empty: "No streak data yet",
+    start: "Sign in to get started",
+    user: "User",
   },
   repoRanking: {
     title: "Repository Rankings",
@@ -131,6 +157,8 @@ const en: typeof ko = {
     stars: "Stars",
     forks: "Forks",
     watchers: "Watchers",
+    current_streak: "Current Streak",
+    longest_streak: "Longest Streak",
   },
   table: {
     year: "Year",

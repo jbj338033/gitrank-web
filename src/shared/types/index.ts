@@ -21,6 +21,8 @@ export interface UserRankingRow {
   total_reviews: number;
   total_stars: number;
   total_forks: number;
+  current_streak: number;
+  longest_streak: number;
 }
 
 export interface UserRankingResponse {
@@ -64,6 +66,11 @@ export interface UserDetail {
     total_reviews: number;
     total_stars: number;
     total_forks: number;
+  } | null;
+  streak: {
+    current_streak: number;
+    longest_streak: number;
+    rank: number | null;
   } | null;
   contributions: ContributionYear[];
   top_repositories: RepoSummary[];

@@ -11,7 +11,7 @@ async function redirectToGitHub() {
   sessionStorage.setItem("oauth_state", state);
   const params = new URLSearchParams({
     client_id: GITHUB_CLIENT_ID,
-    scope: "read:user repo",
+    scope: "read:user read:repo",
     state,
   });
   window.location.href = `https://github.com/login/oauth/authorize?${params}`;
@@ -57,7 +57,10 @@ function LoginPage() {
             s.id === status.step ? { ...s, message: status.message } : s,
           );
         }
-        return [...updated, { id: status.step, message: status.message, done: false }];
+        return [
+          ...updated,
+          { id: status.step, message: status.message, done: false },
+        ];
       });
     },
     [],
@@ -88,7 +91,6 @@ function LoginPage() {
   }, [code, state, navigate, qc, handleStatus]);
 
   if (code) {
-
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="w-full max-w-sm rounded-xl border border-zinc-800/50 bg-zinc-900/20 p-6 sm:p-8">
@@ -100,7 +102,9 @@ function LoginPage() {
             {error ? (
               <p className="mt-2 text-sm text-red-400">{t("login.failed")}</p>
             ) : steps.length === 0 ? (
-              <p className="mt-2 text-sm text-zinc-500">{t("login.connecting")}</p>
+              <p className="mt-2 text-sm text-zinc-500">
+                {t("login.connecting")}
+              </p>
             ) : null}
           </div>
           {steps.length === 0 && !error ? (
@@ -113,7 +117,10 @@ function LoginPage() {
                 <div className="absolute left-[9px] top-3 bottom-3 w-px bg-zinc-800" />
               )}
               {steps.map((step) => (
-                <div key={step.id} className="relative flex items-start gap-3 pb-4 last:pb-0">
+                <div
+                  key={step.id}
+                  className="relative flex items-start gap-3 pb-4 last:pb-0"
+                >
                   <div className="relative z-10 mt-0.5 shrink-0">
                     {step.done ? (
                       <span className="flex h-[19px] w-[19px] items-center justify-center rounded-full bg-accent-500/15 text-[11px] text-accent-400">
@@ -125,7 +132,9 @@ function LoginPage() {
                       </span>
                     )}
                   </div>
-                  <span className={`text-sm leading-5 ${step.done ? "text-zinc-500" : "text-zinc-200"}`}>
+                  <span
+                    className={`text-sm leading-5 ${step.done ? "text-zinc-500" : "text-zinc-200"}`}
+                  >
                     {step.message}
                   </span>
                 </div>
@@ -145,10 +154,11 @@ function LoginPage() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="w-full max-w-sm rounded-xl border border-zinc-800/50 bg-zinc-900/20 p-6 sm:p-8 text-center">
-        <h1 className="mb-2 text-4xl tracking-tight"><span className="font-light">git</span><span className="font-bold">rank</span></h1>
-        <p className="mb-8 text-sm text-zinc-500">
-          {t("login.title")}
-        </p>
+        <h1 className="mb-2 text-4xl tracking-tight">
+          <span className="font-light">git</span>
+          <span className="font-bold">rank</span>
+        </h1>
+        <p className="mb-8 text-sm text-zinc-500">{t("login.title")}</p>
         <button
           onClick={() => redirectToGitHub()}
           className="inline-flex items-center gap-2.5 rounded-lg border border-zinc-800 bg-zinc-800/50 px-6 py-3 text-sm font-medium text-zinc-200 transition-colors hover:border-zinc-700 hover:bg-zinc-800"

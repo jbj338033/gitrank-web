@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersIndexRouteImport } from './routes/users/index'
+import { Route as StreaksIndexRouteImport } from './routes/streaks/index'
 import { Route as ReposIndexRouteImport } from './routes/repos/index'
 import { Route as UsersUsernameRouteImport } from './routes/users/$username'
 import { Route as ReposOwnerRepoRouteImport } from './routes/repos/$owner.$repo'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const UsersIndexRoute = UsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StreaksIndexRoute = StreaksIndexRouteImport.update({
+  id: '/streaks/',
+  path: '/streaks/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReposIndexRoute = ReposIndexRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/users/$username': typeof UsersUsernameRoute
   '/repos/': typeof ReposIndexRoute
+  '/streaks/': typeof StreaksIndexRoute
   '/users/': typeof UsersIndexRoute
   '/repos/$owner/$repo': typeof ReposOwnerRepoRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/users/$username': typeof UsersUsernameRoute
   '/repos': typeof ReposIndexRoute
+  '/streaks': typeof StreaksIndexRoute
   '/users': typeof UsersIndexRoute
   '/repos/$owner/$repo': typeof ReposOwnerRepoRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/users/$username': typeof UsersUsernameRoute
   '/repos/': typeof ReposIndexRoute
+  '/streaks/': typeof StreaksIndexRoute
   '/users/': typeof UsersIndexRoute
   '/repos/$owner/$repo': typeof ReposOwnerRepoRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/users/$username'
     | '/repos/'
+    | '/streaks/'
     | '/users/'
     | '/repos/$owner/$repo'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/users/$username'
     | '/repos'
+    | '/streaks'
     | '/users'
     | '/repos/$owner/$repo'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/users/$username'
     | '/repos/'
+    | '/streaks/'
     | '/users/'
     | '/repos/$owner/$repo'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   UsersUsernameRoute: typeof UsersUsernameRoute
   ReposIndexRoute: typeof ReposIndexRoute
+  StreaksIndexRoute: typeof StreaksIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
   ReposOwnerRepoRoute: typeof ReposOwnerRepoRoute
 }
@@ -129,6 +142,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users/'
       preLoaderRoute: typeof UsersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/streaks/': {
+      id: '/streaks/'
+      path: '/streaks'
+      fullPath: '/streaks/'
+      preLoaderRoute: typeof StreaksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/repos/': {
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   UsersUsernameRoute: UsersUsernameRoute,
   ReposIndexRoute: ReposIndexRoute,
+  StreaksIndexRoute: StreaksIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
   ReposOwnerRepoRoute: ReposOwnerRepoRoute,
 }

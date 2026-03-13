@@ -32,7 +32,7 @@ export function Navbar() {
             <span className="font-light">git</span><span className="font-bold">rank</span>
           </Link>
           <div className="flex gap-5">
-            {(["/users", "/repos"] as const).map((to) => (
+            {(["/users", "/streaks", "/repos"] as const).map((to) => (
               <Link
                 key={to}
                 to={to}
@@ -42,7 +42,7 @@ export function Navbar() {
                     : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
-                {to === "/users" ? t("nav.users") : t("nav.repos")}
+                {to === "/users" ? t("nav.users") : to === "/streaks" ? t("nav.streaks") : t("nav.repos")}
               </Link>
             ))}
           </div>
