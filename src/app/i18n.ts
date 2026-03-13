@@ -4,6 +4,7 @@ import { initReactI18next } from "react-i18next";
 const ko = {
   nav: {
     users: "유저",
+    streaks: "스트릭",
     repos: "저장소",
     profile: "프로필",
     logout: "로그아웃",
@@ -44,6 +45,12 @@ const ko = {
     myRepos: "내 저장소",
     topRepos: "상위 저장소",
   },
+  streakRanking: {
+    title: "스트릭 랭킹",
+    empty: "아직 스트릭 데이터가 없습니다",
+    start: "로그인하여 시작하기",
+    user: "유저",
+  },
   repoRanking: {
     title: "저장소 랭킹",
     languagePlaceholder: "언어...",
@@ -78,6 +85,7 @@ const ko = {
 const en: typeof ko = {
   nav: {
     users: "Users",
+    streaks: "Streaks",
     repos: "Repos",
     profile: "Profile",
     logout: "Logout",
@@ -117,6 +125,12 @@ const en: typeof ko = {
     streakRank: "Streak Rank",
     myRepos: "My Repositories",
     topRepos: "Top Repositories",
+  },
+  streakRanking: {
+    title: "Streak Rankings",
+    empty: "No streak data yet",
+    start: "Sign in to get started",
+    user: "User",
   },
   repoRanking: {
     title: "Repository Rankings",
