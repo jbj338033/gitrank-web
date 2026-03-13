@@ -10,7 +10,7 @@ export const Route = createFileRoute("/users/")({
   component: UsersPage,
 });
 
-const SORT_KEYS = ["score", "commits", "prs", "issues", "reviews", "stars", "forks", "current_streak", "longest_streak"] as const;
+const SORT_KEYS = ["score", "commits", "prs", "issues", "reviews", "stars", "forks"] as const;
 
 function UsersPage() {
   const { t } = useTranslation();
@@ -124,7 +124,6 @@ function UsersPage() {
                 <th className="hidden px-4 py-3 text-right text-xs font-medium text-zinc-500 sm:table-cell">{t("sort.commits")}</th>
                 <th className="hidden px-4 py-3 text-right text-xs font-medium text-zinc-500 md:table-cell">{t("sort.prs")}</th>
                 <th className="hidden px-4 py-3 text-right text-xs font-medium text-zinc-500 lg:table-cell">{t("sort.stars")}</th>
-                <th className="hidden px-4 py-3 text-right text-xs font-medium text-zinc-500 lg:table-cell">{t("sort.current_streak")}</th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500">{t("sort.score")}</th>
               </tr>
             </thead>
@@ -165,9 +164,6 @@ function UsersPage() {
                   </td>
                   <td className="hidden px-4 py-3 text-right font-mono tabular-nums text-zinc-300 lg:table-cell">
                     {u.total_stars.toLocaleString()}
-                  </td>
-                  <td className="hidden px-4 py-3 text-right font-mono tabular-nums text-zinc-300 lg:table-cell">
-                    {u.current_streak > 0 ? `${u.current_streak}d` : "-"}
                   </td>
                   <td className="px-4 py-3 text-right font-mono font-semibold tabular-nums text-zinc-100">
                     {u.score.toFixed(1)}
