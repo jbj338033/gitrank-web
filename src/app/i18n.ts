@@ -12,6 +12,7 @@ const ko = {
   home: {
     topUsers: "상위 유저",
     topRepos: "상위 저장소",
+    topStreaks: "상위 스트릭",
     viewAll: "전체 보기",
   },
   login: {
@@ -37,6 +38,9 @@ const ko = {
     sync: "데이터 동기화",
     syncFailed: "동기화에 실패했습니다",
     contributions: "기여 활동",
+    currentStreak: "현재 스트릭",
+    longestStreak: "최장 스트릭",
+    streakRank: "스트릭 순위",
     myRepos: "내 저장소",
     topRepos: "상위 저장소",
   },
@@ -63,6 +67,8 @@ const ko = {
     stars: "스타",
     forks: "포크",
     watchers: "워처",
+    current_streak: "현재 스트릭",
+    longest_streak: "최장 스트릭",
   },
   table: {
     year: "연도",
@@ -80,6 +86,7 @@ const en: typeof ko = {
   home: {
     topUsers: "Top Users",
     topRepos: "Top Repositories",
+    topStreaks: "Top Streaks",
     viewAll: "View all",
   },
   login: {
@@ -105,6 +112,9 @@ const en: typeof ko = {
     sync: "Sync data",
     syncFailed: "Sync failed",
     contributions: "Contributions",
+    currentStreak: "Current Streak",
+    longestStreak: "Longest Streak",
+    streakRank: "Streak Rank",
     myRepos: "My Repositories",
     topRepos: "Top Repositories",
   },
@@ -131,6 +141,8 @@ const en: typeof ko = {
     stars: "Stars",
     forks: "Forks",
     watchers: "Watchers",
+    current_streak: "Current Streak",
+    longest_streak: "Longest Streak",
   },
   table: {
     year: "Year",
