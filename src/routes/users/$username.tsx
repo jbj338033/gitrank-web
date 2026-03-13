@@ -69,7 +69,7 @@ function UserDetailPage() {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl font-bold tracking-tight">{user.login}</h1>
-              {user.ranking?.rank && (
+              {user.ranking?.rank != null && (
                 <span className="rounded-full bg-accent-500/15 px-3 py-0.5 text-sm font-medium tabular-nums text-accent-400">
                   #{user.ranking.rank}
                 </span>
@@ -140,7 +140,7 @@ function UserDetailPage() {
               <span className="text-zinc-500">{t("userDetail.longestStreak")}</span>{" "}
               <span className="font-semibold tabular-nums text-zinc-200">{user.streak.longest_streak}d</span>
             </div>
-            {user.streak.rank && (
+            {user.streak.rank != null && (
               <div>
                 <span className="text-zinc-500">{t("userDetail.streakRank")}</span>{" "}
                 <span className="font-semibold tabular-nums text-zinc-200">#{user.streak.rank}</span>
