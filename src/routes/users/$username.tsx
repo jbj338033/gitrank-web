@@ -130,6 +130,24 @@ function UserDetailPage() {
             </div>
           </div>
         )}
+        {user.streak && (
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-zinc-800/50 pt-5 text-sm">
+            <div>
+              <span className="text-zinc-500">{t("userDetail.currentStreak")}</span>{" "}
+              <span className="font-semibold tabular-nums text-accent-400">{user.streak.current_streak}d</span>
+            </div>
+            <div>
+              <span className="text-zinc-500">{t("userDetail.longestStreak")}</span>{" "}
+              <span className="font-semibold tabular-nums text-zinc-200">{user.streak.longest_streak}d</span>
+            </div>
+            {user.streak.rank && (
+              <div>
+                <span className="text-zinc-500">{t("userDetail.streakRank")}</span>{" "}
+                <span className="font-semibold tabular-nums text-zinc-200">#{user.streak.rank}</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {contributions.length > 0 && (
