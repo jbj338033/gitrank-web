@@ -102,7 +102,9 @@ function UserDetailPage() {
                   {sync.isPending ? t("userDetail.syncing") : t("userDetail.sync")}
                 </button>
                 {sync.isError && (
-                  <span className="text-sm text-red-400">{t("userDetail.syncFailed")}</span>
+                  <span className="text-sm text-red-400">
+                    {sync.error.message}
+                  </span>
                 )}
               </div>
             )}
