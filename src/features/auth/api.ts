@@ -6,6 +6,37 @@ interface SSEStatus {
   message: string;
 }
 
+interface SSEEvent {
+  event: string;
+  data: string;
+}
+
+function parseSSEEvent(raw: string): SSEEvent {
+  let event = "";
+  const dataLines: string[] = [];
+
+  for (const line of raw.split("\n")) {
+    if (!line || line.startsWith(":")) continue;
+
+    const separator = line.indexOf(":");
+    const field = separator === -1 ? line : line.slice(0, separator);
+    const value =
+      separator === -1
+        ? ""
+        : line.slice(separator + 1).replace(/^ /, "");
+
+    if (field === "event") event = value;
+    else if (field === "data") dataLines.push(value);
+  }
+
+  return { event, data: dataLines.join("\n") };
+}
+
+function parseErrorMessage(data: string) {
+  const parsed = JSON.parse(data) as Partial<SSEStatus>;
+  return parsed.message ?? "login failed";
+}
+
 export const authApi = {
   getState: () =>
     client.get("api/auth/state").json<{ state: string }>(),
@@ -29,43 +60,45 @@ export const authApi = {
     const decoder = new TextDecoder();
     let buffer = "";
     let result: User | null = null;
+    let streamError: string | null = null;
+
+    const handleEvent = (raw: string) => {
+      const { event, data } = parseSSEEvent(raw);
+      if (!event || !data) return;
+
+      try {
+        if (event === "status") {
+          onStatus(JSON.parse(data) as SSEStatus);
+        } else if (event === "done") {
+          result = JSON.parse(data) as User;
+        } else if (event === "error") {
+          streamError = parseErrorMessage(data);
+        }
+      } catch {
+        // skip malformed SSE data
+      }
+    };
 
     for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
+      buffer += decoder.decode(value, { stream: true }).replace(/\r\n?/g, "\n");
 
       let boundary = buffer.indexOf("\n\n");
       while (boundary !== -1) {
         const raw = buffer.slice(0, boundary);
         buffer = buffer.slice(boundary + 2);
-
-        let event = "";
-        let data = "";
-        for (const line of raw.split("\n")) {
-          if (line.startsWith("event: ")) event = line.slice(7);
-          else if (line.startsWith("data: ")) data = line.slice(6);
-        }
-
-        try {
-          if (event === "status" && data) {
-            onStatus(JSON.parse(data));
-          } else if (event === "done" && data) {
-            result = JSON.parse(data);
-          } else if (event === "error" && data) {
-            const parsed = JSON.parse(data);
-            onStatus({ step: parsed.step, message: parsed.message });
-          }
-        } catch {
-          // skip malformed SSE data
-        }
+        handleEvent(raw);
 
         boundary = buffer.indexOf("\n\n");
       }
     }
 
-    if (!result) throw new Error("login stream ended without done event");
+    buffer += decoder.decode().replace(/\r\n?/g, "\n");
+    if (buffer.trim()) handleEvent(buffer);
+
+    if (!result) throw new Error(streamError ?? "login stream ended without done event");
     return result;
   },
 

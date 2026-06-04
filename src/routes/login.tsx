@@ -80,8 +80,9 @@ function LoginPage() {
 
     authApi
       .login(code, state, handleStatus)
-      .then(() => {
+      .then((user) => {
         setSteps((prev) => prev.map((s) => ({ ...s, done: true })));
+        qc.setQueryData(["me"], user);
         qc.invalidateQueries({ queryKey: ["me"] });
         setTimeout(() => navigate({ to: "/users" }), 500);
       })
