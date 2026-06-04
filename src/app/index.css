@@ -12,3 +12,15 @@
   --color-accent-800: oklch(0.28 0.09 280);
   --color-accent-900: oklch(0.18 0.05 280);
 }
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
